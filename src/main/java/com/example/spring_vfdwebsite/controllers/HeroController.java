@@ -53,7 +53,7 @@ public class HeroController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<HeroResponseDto> getHeroById(@PathVariable Integer id) {
+    public ResponseEntity<HeroResponseDto> getHeroById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(heroService.getHeroById(id));
     }
 
@@ -83,7 +83,7 @@ public class HeroController {
     )
     @PatchMapping("/{id}")
     public ResponseEntity<HeroResponseDto> updateHero(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @Valid @RequestBody HeroUpdateRequestDto dto
     ) {
         dto.setId(id); // assign id
@@ -99,7 +99,7 @@ public class HeroController {
             }
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteHero(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteHero(@PathVariable("id") Integer id) {
         heroService.deleteHero(id);
         return ResponseEntity.noContent().build();
     }

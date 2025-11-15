@@ -42,7 +42,7 @@ public class BoardDirectorController {
             @ApiResponse(responseCode = "404", description = "Board director not found")
     })
     @GetMapping("/{id}")
-    public BoardDirectorResponseDto getBoardDirectorById(@PathVariable Integer id) {
+    public BoardDirectorResponseDto getBoardDirectorById(@PathVariable("id") Integer id) {
         return boardDirectorService.getBoardDirectorById(id);
     }
 
@@ -65,7 +65,7 @@ public class BoardDirectorController {
     })
     @PatchMapping("/{id}")
     public BoardDirectorResponseDto updateBoardDirector(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @Valid @RequestBody BoardDirectorUpdateRequestDto dto) {
         dto.setId(id); // đảm bảo DTO có ID
         return boardDirectorService.updateBoardDirector(dto);
@@ -77,7 +77,7 @@ public class BoardDirectorController {
             @ApiResponse(responseCode = "404", description = "Board director not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBoardDirector(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteBoardDirector(@PathVariable("id") Integer id) {
         boardDirectorService.deleteBoardDirector(id);
         return ResponseEntity.noContent().build();
     }

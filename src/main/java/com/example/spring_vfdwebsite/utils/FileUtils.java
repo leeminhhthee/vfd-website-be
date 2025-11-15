@@ -2,7 +2,9 @@ package com.example.spring_vfdwebsite.utils;
 
 public class FileUtils {
     public static String formatFileSize(Long sizeInBytes) {
-        if (sizeInBytes == null) return "0 B";
+        if (sizeInBytes == null || sizeInBytes <= 0) {
+            return "0 B";
+        }
 
         double size = sizeInBytes;
         String[] units = {"B", "KB", "MB", "GB", "TB"};

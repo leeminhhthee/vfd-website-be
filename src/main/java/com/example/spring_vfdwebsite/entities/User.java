@@ -2,6 +2,7 @@ package com.example.spring_vfdwebsite.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -22,6 +23,7 @@ public class User extends BaseEntity {
     private String fullName;
 
     @Email
+    @NotNull
     @Column(unique = true, nullable = false)
     private String email;
 

@@ -41,7 +41,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("/{id}")
-    public UserResponseDto getUserById(@PathVariable Integer id) {
+    public UserResponseDto getUserById(@PathVariable("id") Integer id) {
         return userService.getUserById(id);
     }
 
@@ -62,7 +62,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PatchMapping("/{id}")
-    public UserResponseDto updateUser(@PathVariable Integer id, @Valid @RequestBody UserUpdateRequestDto dto) {
+    public UserResponseDto updateUser(@PathVariable("id") Integer id, @Valid @RequestBody UserUpdateRequestDto dto) {
         dto.setId(id); // ensure DTO has ID
         return userService.updateUser(dto);
     }
@@ -73,7 +73,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Integer id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }

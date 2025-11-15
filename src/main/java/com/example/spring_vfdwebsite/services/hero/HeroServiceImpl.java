@@ -2,6 +2,7 @@ package com.example.spring_vfdwebsite.services.hero;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.spring_vfdwebsite.dtos.heroDTOs.HeroCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.heroDTOs.HeroResponseDto;
@@ -13,7 +14,6 @@ import com.example.spring_vfdwebsite.events.hero.HeroUpdatedEvent;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.HeroJpaRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -33,6 +33,7 @@ public class HeroServiceImpl implements HeroService {
     // ===================== Get all =====================
     @Override
     @Cacheable(value = "heroes", key = "'all'")
+    @Transactional(readOnly = true)
     public List<HeroResponseDto> getAllHeroes() {
         System.out.println("🔥 Fetching all heroes from the database...");
         return heroRepository.findAll().stream()
@@ -43,6 +44,7 @@ public class HeroServiceImpl implements HeroService {
     // ===================== Get By Id =====================
     @Override
     @Cacheable(value = "heroes", key = "#id")
+    // @Transactional(readOnly = true)
     public HeroResponseDto getHeroById(Integer id) {
         Hero hero = heroRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hero with id " + id));
