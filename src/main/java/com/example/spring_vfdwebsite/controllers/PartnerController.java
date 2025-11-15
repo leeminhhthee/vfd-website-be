@@ -58,7 +58,7 @@ public class PartnerController {
     )
     @PatchMapping("/{id}")
     public ResponseEntity<PartnerResponseDto> updatePartner(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @RequestBody PartnerUpdateRequestDto dto) {
         dto.setId(id);
         PartnerResponseDto updated = partnerService.updatePartner(dto);
@@ -76,7 +76,7 @@ public class PartnerController {
             }
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePartner(@PathVariable Integer id) {
+    public ResponseEntity<Void> deletePartner(@PathVariable("id") Integer id) {
         partnerService.deletePartner(id);
         return ResponseEntity.noContent().build();
     }
@@ -93,7 +93,7 @@ public class PartnerController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<PartnerResponseDto> getPartnerById(@PathVariable Integer id) {
+    public ResponseEntity<PartnerResponseDto> getPartnerById(@PathVariable("id") Integer id) {
         PartnerResponseDto partner = partnerService.getPartnerById(id);
         return ResponseEntity.ok(partner);
     }

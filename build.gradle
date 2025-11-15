@@ -51,8 +51,15 @@ dependencies {
 
 	// Cloudinary
 	implementation 'com.cloudinary:cloudinary-http44:1.36.0'
+
+	// Dotenv
+	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ["-parameters"]
 }

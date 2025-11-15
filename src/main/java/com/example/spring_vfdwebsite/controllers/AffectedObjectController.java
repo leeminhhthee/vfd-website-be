@@ -57,7 +57,7 @@ public class AffectedObjectController {
     )
     @PatchMapping("/{id}")
     public ResponseEntity<AffectedObjectResponseDto> update(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @Valid @RequestBody AffectedObjectUpdateRequestDto dto) {
         AffectedObjectResponseDto updated = service.updateAffectedObject(dto);
         return ResponseEntity.ok(updated);
@@ -74,7 +74,7 @@ public class AffectedObjectController {
             }
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Integer id) {
         service.deleteAffectedObject(id);
         return ResponseEntity.noContent().build();
     }
@@ -92,7 +92,7 @@ public class AffectedObjectController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<AffectedObjectResponseDto> getById(@PathVariable Integer id) {
+    public ResponseEntity<AffectedObjectResponseDto> getById(@PathVariable("id") Integer id) {
         AffectedObjectResponseDto dto = service.getAffectedObjectById(id);
         return ResponseEntity.ok(dto);
     }
