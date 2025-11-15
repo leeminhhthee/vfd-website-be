@@ -48,6 +48,9 @@ dependencies {
 
 	// Add caching dependencies
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+	// Cloudinary
+	implementation 'com.cloudinary:cloudinary-http44:1.36.0'
 }
 
 tasks.named('test') {
