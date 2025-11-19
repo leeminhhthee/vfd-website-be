@@ -11,6 +11,8 @@ import com.example.spring_vfdwebsite.exceptions.EntityDuplicateException;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.exceptions.HttpException;
 import com.example.spring_vfdwebsite.repositories.UserJpaRepository;
+import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserJpaRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final CloudinaryUtils cloudinaryUtils;
 
     @Autowired
     private final ApplicationEventPublisher eventPublisher;
@@ -64,7 +67,8 @@ public class UserServiceImpl implements UserService {
         // Business rule: password is required only when creating an admin user
         if (Boolean.TRUE.equals(createDto.getIsAdmin())) {
             if (createDto.getPassword() == null || createDto.getPassword().isBlank()) {
-                throw new HttpException("Password is required when creating an admin user", org.springframework.http.HttpStatus.BAD_REQUEST);
+                throw new HttpException("Password is required when creating an admin user",
+                        org.springframework.http.HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -77,10 +81,12 @@ public class UserServiceImpl implements UserService {
                 .hobby(createDto.getHobby())
                 .build();
 
-        // Ensure admin flag is applied explicitly on the entity (avoids builder naming/boxing pitfalls)
+        // Ensure admin flag is applied explicitly on the entity (avoids builder
+        // naming/boxing pitfalls)
         user.setAdmin(Boolean.TRUE.equals(createDto.getIsAdmin()));
 
-        // Apply password only for admin users; non-admin users will have an empty password
+        // Apply password only for admin users; non-admin users will have an empty
+        // password
         // Store passwords encoded using BCrypt
         if (Boolean.TRUE.equals(createDto.getIsAdmin())) {
             user.setPassword(passwordEncoder.encode(createDto.getPassword()));
@@ -141,7 +147,8 @@ public class UserServiceImpl implements UserService {
             user.setPassword(updateDto.getPassword());
         if (updateDto.getIsAdmin() != null) {
             user.setAdmin(updateDto.getIsAdmin());
-            // If user is downgraded to non-admin, clear password to align with member behavior
+            // If user is downgraded to non-admin, clear password to align with member
+            // behavior
             if (!user.isAdmin()) {
                 user.setPassword("");
             }
@@ -158,8 +165,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @CacheEvict(value = "users", key = "#id")
     public void deleteUser(Integer id) {
-        userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id));
+
+        if (user.getImageUrl() != null) {
+            cloudinaryUtils.deleteFile(user.getImageUrl());
+        }
         userRepository.deleteById(id);
 
         // Phát sự kiện UserDeletedEvent

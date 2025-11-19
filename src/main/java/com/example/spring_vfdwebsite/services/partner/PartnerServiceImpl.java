@@ -17,6 +17,7 @@ import com.example.spring_vfdwebsite.events.partner.PartnerDeletedEvent;
 import com.example.spring_vfdwebsite.events.partner.PartnerUpdatedEvent;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.PartnerJpaRepository;
+import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +28,8 @@ public class PartnerServiceImpl implements PartnerService {
 
     private final PartnerJpaRepository partnerRepository;
     private final ApplicationEventPublisher eventPublisher;
-    
+    private final CloudinaryUtils cloudinaryUtils;
+
     // ===== Helper mapping =====
     private PartnerResponseDto toDto(Partner partner) {
         return PartnerResponseDto.builder()
@@ -88,10 +90,14 @@ public class PartnerServiceImpl implements PartnerService {
         Partner partner = partnerRepository.findById(updateRequestDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Partner with id " + updateRequestDto.getId()));
 
-        if (updateRequestDto.getName() != null) partner.setName(updateRequestDto.getName());
-        if (updateRequestDto.getEmail() != null) partner.setEmail(updateRequestDto.getEmail());
-        if (updateRequestDto.getImageUrl() != null) partner.setImageUrl(updateRequestDto.getImageUrl());
-        if (updateRequestDto.getSince() != null) partner.setSince(updateRequestDto.getSince());
+        if (updateRequestDto.getName() != null)
+            partner.setName(updateRequestDto.getName());
+        if (updateRequestDto.getEmail() != null)
+            partner.setEmail(updateRequestDto.getEmail());
+        if (updateRequestDto.getImageUrl() != null)
+            partner.setImageUrl(updateRequestDto.getImageUrl());
+        if (updateRequestDto.getSince() != null)
+            partner.setSince(updateRequestDto.getSince());
 
         partner = partnerRepository.save(partner);
 
@@ -108,6 +114,9 @@ public class PartnerServiceImpl implements PartnerService {
         Partner partner = partnerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Partner with id " + id));
 
+        if (partner.getImageUrl() != null) {
+            cloudinaryUtils.deleteFile(partner.getImageUrl());
+        }
         partnerRepository.delete(partner);
 
         eventPublisher.publishEvent(new PartnerDeletedEvent(id));

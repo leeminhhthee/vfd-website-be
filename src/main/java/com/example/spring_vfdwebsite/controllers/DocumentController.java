@@ -1,12 +1,9 @@
 package com.example.spring_vfdwebsite.controllers;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.spring_vfdwebsite.dtos.documentDTOs.DocumentCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.documentDTOs.DocumentResponseDto;
@@ -17,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -57,17 +53,11 @@ public class DocumentController {
                         @ApiResponse(responseCode = "200", description = "Document created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DocumentResponseDto.class))),
                         @ApiResponse(responseCode = "400", description = "Invalid input")
         })
-        @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        @PostMapping
         public ResponseEntity<DocumentResponseDto> createDocument(
-                        @RequestParam("title") String title,
-                        @RequestParam("category") String category,
-                        @RequestPart("file") MultipartFile file) throws IOException {
+                        @RequestBody DocumentCreateRequestDto dto) {
 
-                DocumentCreateRequestDto dto = new DocumentCreateRequestDto();
-                dto.setTitle(title);
-                dto.setCategory(category);
-
-                DocumentResponseDto createdDocument = documentService.createDocument(dto, file);
+                DocumentResponseDto createdDocument = documentService.createDocument(dto);
                 return ResponseEntity.ok(createdDocument);
         }
 
@@ -76,20 +66,13 @@ public class DocumentController {
                         @ApiResponse(responseCode = "200", description = "Document updated", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DocumentResponseDto.class))),
                         @ApiResponse(responseCode = "404", description = "Document not found")
         })
-        @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        @PatchMapping(value = "/{id}")
         public ResponseEntity<DocumentResponseDto> updateDocument(
                         @PathVariable("id") Integer id,
-                        @RequestParam(value = "title", required = false) String title,
-                        @RequestParam(value = "category", required = false) String category,
-                        @RequestPart(value = "file", required = false) MultipartFile file)
-                        throws IOException {
+                        @RequestBody DocumentUpdateRequestDto dto) {
 
-                DocumentUpdateRequestDto dto = new DocumentUpdateRequestDto();
                 dto.setId(id);
-                dto.setTitle(title);
-                dto.setCategory(category);
-
-                DocumentResponseDto updatedDocument = documentService.updateDocument(dto, file);
+                DocumentResponseDto updatedDocument = documentService.updateDocument(dto);
                 return ResponseEntity.ok(updatedDocument);
         }
 

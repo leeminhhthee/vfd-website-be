@@ -45,5 +45,5 @@ public class BoardDirectorUpdateRequestDto {
 
     @Schema(description = "Image URL or Base64 encoded string representing the director’s photo",
             example = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...")
-    private String image;
+    private String imageUrl;
 }

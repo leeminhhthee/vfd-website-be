@@ -19,6 +19,7 @@ import com.example.spring_vfdwebsite.events.affectedObjects.AffectedObjectDetele
 import com.example.spring_vfdwebsite.events.affectedObjects.AffectedObjectUpdatedEvent;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.AffectedObjectJpaRepository;
+import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,13 +28,15 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class AffectedObjectServiceImpl implements AffectedObjectService {
 
+    private final CloudinaryUtils cloudinaryUtils;
     private final AffectedObjectJpaRepository affectedObjectRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     // Create
     @Override
     @CacheEvict(value = "affected-objects", key = "'all'")
-    public AffectedObjectResponseDto createAffectedObject(AffectedObjectCreateRequestDto affectedObjectCreateRequestDto) {
+    public AffectedObjectResponseDto createAffectedObject(
+            AffectedObjectCreateRequestDto affectedObjectCreateRequestDto) {
         AffectedObject obj = AffectedObject.builder()
                 .title(affectedObjectCreateRequestDto.getTitle())
                 .description(affectedObjectCreateRequestDto.getDescription())
@@ -42,7 +45,7 @@ public class AffectedObjectServiceImpl implements AffectedObjectService {
 
         obj = affectedObjectRepository.save(obj);
 
-         // Phát sự kiện AffectedObjectCreatedEvent
+        // Phát sự kiện AffectedObjectCreatedEvent
         eventPublisher.publishEvent(new AffectedObjectCreatedEvent(obj.getId(), obj));
         return toDto(obj);
     }
@@ -51,13 +54,18 @@ public class AffectedObjectServiceImpl implements AffectedObjectService {
     @Override
     @CachePut(value = "affected-objects", key = "#affectedObjectUpdateRequestDto.id")
     @CacheEvict(value = "affected-objects", key = "'all'")
-    public AffectedObjectResponseDto updateAffectedObject(AffectedObjectUpdateRequestDto affectedObjectUpdateRequestDto) {
+    public AffectedObjectResponseDto updateAffectedObject(
+            AffectedObjectUpdateRequestDto affectedObjectUpdateRequestDto) {
         AffectedObject obj = affectedObjectRepository.findById(affectedObjectUpdateRequestDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("AffectedObject with id " + affectedObjectUpdateRequestDto.getId() + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "AffectedObject with id " + affectedObjectUpdateRequestDto.getId() + " not found"));
 
-        if (affectedObjectUpdateRequestDto.getTitle() != null) obj.setTitle(affectedObjectUpdateRequestDto.getTitle());
-        if (affectedObjectUpdateRequestDto.getDescription() != null) obj.setDescription(affectedObjectUpdateRequestDto.getDescription());
-        if (affectedObjectUpdateRequestDto.getImageUrl() != null) obj.setImageUrl(affectedObjectUpdateRequestDto.getImageUrl());
+        if (affectedObjectUpdateRequestDto.getTitle() != null)
+            obj.setTitle(affectedObjectUpdateRequestDto.getTitle());
+        if (affectedObjectUpdateRequestDto.getDescription() != null)
+            obj.setDescription(affectedObjectUpdateRequestDto.getDescription());
+        if (affectedObjectUpdateRequestDto.getImageUrl() != null)
+            obj.setImageUrl(affectedObjectUpdateRequestDto.getImageUrl());
         obj = affectedObjectRepository.save(obj);
 
         // Phát sự kiện AffectedObjectUpdatedEvent
@@ -73,6 +81,9 @@ public class AffectedObjectServiceImpl implements AffectedObjectService {
         AffectedObject obj = affectedObjectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("AffectedObject with id " + id + " not found"));
 
+        if (obj.getImageUrl() != null) {
+            cloudinaryUtils.deleteFile(obj.getImageUrl());
+        }
         affectedObjectRepository.delete(obj);
 
         // Phát sự kiện AffectedObjectDeletedEvent
@@ -110,5 +121,5 @@ public class AffectedObjectServiceImpl implements AffectedObjectService {
                 .updatedAt(obj.getUpdatedAt())
                 .build();
     }
-    
+
 }

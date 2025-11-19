@@ -7,6 +7,8 @@ import com.example.spring_vfdwebsite.entities.BoardDirector;
 import com.example.spring_vfdwebsite.exceptions.EntityDuplicateException;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.BoardDirectorJpaRepository;
+import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class BoardDirectorServiceImpl implements BoardDirectorService {
 
     private final BoardDirectorJpaRepository boardDirectorRepository;
+    private final CloudinaryUtils cloudinaryUtils;
 
     // Convert entity to DTO
     private BoardDirectorResponseDto toDto(BoardDirector director) {
@@ -33,7 +36,7 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
                 .role(director.getRole())
                 .term(director.getTerm())
                 .bio(director.getBio())
-                .image(director.getImage())
+                .imageUrl(director.getImageUrl())
                 .createdAt(director.getCreatedAt())
                 .updatedAt(director.getUpdatedAt())
                 .build();
@@ -55,7 +58,7 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
                 .role(createDto.getRole())
                 .term(createDto.getTerm())
                 .bio(createDto.getBio())
-                .image(createDto.getImage())
+                .imageUrl(createDto.getImageUrl())
                 .build();
 
         director = boardDirectorRepository.save(director);
@@ -95,7 +98,8 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
             }
             director.setEmail(updateDto.getEmail());
         }
-        if (updateDto.getFullName() != null) director.setFullName(updateDto.getFullName());
+        if (updateDto.getFullName() != null)
+            director.setFullName(updateDto.getFullName());
         if (updateDto.getEmail() != null) {
             List<BoardDirector> found = boardDirectorRepository.findByEmail(updateDto.getEmail());
             if (!found.isEmpty() && !found.get(0).getId().equals(updateDto.getId())) {
@@ -103,11 +107,16 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
             }
             director.setEmail(updateDto.getEmail());
         }
-        if (updateDto.getPhoneNumber() != null) director.setPhoneNumber(updateDto.getPhoneNumber());
-        if (updateDto.getRole() != null) director.setRole(updateDto.getRole());
-        if (updateDto.getTerm() != null) director.setTerm(updateDto.getTerm());
-        if (updateDto.getBio() != null) director.setBio(updateDto.getBio());
-        if (updateDto.getImage() != null) director.setImage(updateDto.getImage());
+        if (updateDto.getPhoneNumber() != null)
+            director.setPhoneNumber(updateDto.getPhoneNumber());
+        if (updateDto.getRole() != null)
+            director.setRole(updateDto.getRole());
+        if (updateDto.getTerm() != null)
+            director.setTerm(updateDto.getTerm());
+        if (updateDto.getBio() != null)
+            director.setBio(updateDto.getBio());
+        if (updateDto.getImageUrl() != null)
+            director.setImageUrl(updateDto.getImageUrl());
 
         director = boardDirectorRepository.save(director);
         return toDto(director);
@@ -117,8 +126,13 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
     @Override
     @CacheEvict(value = "board-directors", key = "#id")
     public void deleteBoardDirector(Integer id) {
-        boardDirectorRepository.findById(id)
+        BoardDirector director = boardDirectorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("BoardDirector with id " + id));
+                
+        if (director.getImageUrl() != null) {
+            cloudinaryUtils.deleteFile(director.getImageUrl());
+        }
+        
         boardDirectorRepository.deleteById(id);
     }
 }

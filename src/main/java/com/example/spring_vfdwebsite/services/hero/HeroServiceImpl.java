@@ -13,6 +13,7 @@ import com.example.spring_vfdwebsite.events.hero.HeroDeletedEvent;
 import com.example.spring_vfdwebsite.events.hero.HeroUpdatedEvent;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.HeroJpaRepository;
+import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +30,8 @@ public class HeroServiceImpl implements HeroService {
 
     private final HeroJpaRepository heroRepository;
     private final ApplicationEventPublisher eventPublisher;
-    
+    private final CloudinaryUtils cloudinaryUtils;
+
     // ===================== Get all =====================
     @Override
     @Cacheable(value = "heroes", key = "'all'")
@@ -82,13 +84,20 @@ public class HeroServiceImpl implements HeroService {
         Hero hero = heroRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Hero with id " + dto.getId()));
 
-        if (dto.getTitle() != null) hero.setTitle(dto.getTitle());
-        if (dto.getSubTitle() != null) hero.setSubTitle(dto.getSubTitle());
-        if (dto.getImageUrl() != null) hero.setImageUrl(dto.getImageUrl());
-        if (dto.getButtonText() != null) hero.setButtonText(dto.getButtonText());
-        if (dto.getButtonHref() != null) hero.setButtonHref(dto.getButtonHref());
-        if (dto.getButtonText2() != null) hero.setButtonText2(dto.getButtonText2());
-        if (dto.getButtonHref2() != null) hero.setButtonHref2(dto.getButtonHref2());
+        if (dto.getTitle() != null)
+            hero.setTitle(dto.getTitle());
+        if (dto.getSubTitle() != null)
+            hero.setSubTitle(dto.getSubTitle());
+        if (dto.getImageUrl() != null)
+            hero.setImageUrl(dto.getImageUrl());
+        if (dto.getButtonText() != null)
+            hero.setButtonText(dto.getButtonText());
+        if (dto.getButtonHref() != null)
+            hero.setButtonHref(dto.getButtonHref());
+        if (dto.getButtonText2() != null)
+            hero.setButtonText2(dto.getButtonText2());
+        if (dto.getButtonHref2() != null)
+            hero.setButtonHref2(dto.getButtonHref2());
 
         hero = heroRepository.save(hero);
 
@@ -104,6 +113,10 @@ public class HeroServiceImpl implements HeroService {
     public void deleteHero(Integer id) {
         Hero hero = heroRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hero with id " + id));
+
+        if (hero.getImageUrl() != null) {
+            cloudinaryUtils.deleteFile(hero.getImageUrl());
+        }
 
         heroRepository.delete(hero);
 

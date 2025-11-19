@@ -1,5 +1,7 @@
 package com.example.spring_vfdwebsite.dtos.documentDTOs;
 
+import com.example.spring_vfdwebsite.entities.Document.DocumentCategory;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,7 +22,7 @@ public class DocumentCreateRequestDto {
 
     @Schema(description = "Category of the document: plan, charter, forms, regulations", example = "plan", required = true)
     @NotNull(message = "category is required")
-    private String category;
+    private DocumentCategory category;
 
     @Schema(description = "Original file name stored on Cloudinary", example = "ke-hoach-2025.pdf")
     private String fileName;
@@ -34,8 +36,4 @@ public class DocumentCreateRequestDto {
 
     @Schema(description = "File size in bytes", example = "2048000")
     private Long fileSize;
-
-    // @Schema(description = "ID of the user who uploaded the document", example = "1", required = true)
-    // @NotNull(message = "uploadedById is required")
-    // private Integer uploadedById;
 }
