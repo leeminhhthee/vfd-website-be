@@ -1,5 +1,7 @@
 package com.example.spring_vfdwebsite.dtos.documentDTOs;
 
+import com.example.spring_vfdwebsite.entities.Document.DocumentCategory;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -20,7 +22,7 @@ public class DocumentUpdateRequestDto {
     private String title;
 
     @Schema(description = "Category of the document: plan, charter, forms, regulations", example = "plan")
-    private String category;
+    private DocumentCategory category;
 
     @Schema(description = "Original file name stored on Cloudinary", example = "ke-hoach-2025.pdf")
     private String fileName;

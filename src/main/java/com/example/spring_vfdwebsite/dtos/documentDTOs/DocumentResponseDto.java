@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import com.example.spring_vfdwebsite.entities.Document.DocumentCategory;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,7 +22,7 @@ public class DocumentResponseDto {
     private String title;
 
     @Schema(description = "Category of the document", example = "plan")
-    private String category;
+    private DocumentCategory category;
 
     @Schema(description = "File name stored on Cloudinary", example = "document_001.pdf")
     private String fileName;
@@ -54,7 +56,4 @@ public class DocumentResponseDto {
 
     @Schema(description = "Information about the user who uploaded the document")
     private UploadedByDto uploadedBy;
-
-    @Schema(description = "Current status of the document upload", example = "COMPLETED")
-    private String status;
 }

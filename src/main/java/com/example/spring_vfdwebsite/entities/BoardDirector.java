@@ -48,6 +48,6 @@ public class BoardDirector extends BaseEntity {
     private String bio;
 
     @Size(max = 500)
-    @Column(name = "image", length = 500)
-    private String image;
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
 }

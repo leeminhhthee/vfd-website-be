@@ -1,10 +1,8 @@
 package com.example.spring_vfdwebsite.services.document;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -12,15 +10,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.example.spring_vfdwebsite.dtos.documentDTOs.DocumentCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.documentDTOs.DocumentResponseDto;
 import com.example.spring_vfdwebsite.dtos.documentDTOs.DocumentUpdateRequestDto;
 import com.example.spring_vfdwebsite.entities.Document;
-import com.example.spring_vfdwebsite.entities.Document.DocumentStatus;
 import com.example.spring_vfdwebsite.entities.User;
 import com.example.spring_vfdwebsite.events.document.DocumentCreatedEvent;
 import com.example.spring_vfdwebsite.events.document.DocumentDeletedEvent;
@@ -37,13 +31,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
 
-    private final Cloudinary cloudinary;
     private final DocumentJpaRepository documentRepository;
     private final UserJpaRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
-
-    @Autowired
-    private AsyncUploadDocumentService asyncUploadService;
+    private final CloudinaryUtils cloudinaryUtils;
 
     // ===================== Get all =====================
     @Override
@@ -71,7 +62,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     @CacheEvict(value = "documents", allEntries = true)
-    public DocumentResponseDto createDocument(DocumentCreateRequestDto dto, MultipartFile file) throws IOException {
+    public DocumentResponseDto createDocument(DocumentCreateRequestDto dto) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = ((org.springframework.security.core.userdetails.User) principal).getUsername();
@@ -79,25 +70,36 @@ public class DocumentServiceImpl implements DocumentService {
         User currentUser = userRepository.findByEmailIgnoreCase(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
 
-        byte[] fileBytes = file.getBytes();
-        String originalFilename = file.getOriginalFilename();
-        String fileType = file.getContentType();
-        Long fileSize = file.getSize();
+        String fileName = dto.getFileName();
+        String fileType = dto.getFileType();
+        Long fileSize = dto.getFileSize();
+
+        // Nếu chỉ có fileUrl, lấy metadata
+        if (dto.getFileUrl() != null && (fileName == null || fileType == null || fileSize == null)) {
+            try {
+                var response = cloudinaryUtils.getMetadata(dto.getFileUrl());
+                if (fileName == null)
+                    fileName = response.get("original_filename") + "." + response.get("format");
+                if (fileType == null)
+                    fileType = CloudinaryUtils.mapFormatToMimeType((String) response.get("format"));
+                if (fileSize == null)
+                    fileSize = ((Number) response.get("bytes")).longValue();
+            } catch (Exception e) {
+                System.err.println("⚠️ Failed to fetch metadata from Cloudinary: " + e.getMessage());
+            }
+        }
 
         Document document = Document.builder()
                 .title(dto.getTitle())
-                .category(Document.DocumentCategory.fromValue(dto.getCategory()))
-                .fileName(originalFilename)
-                .fileUrl(null) // Url chưa có
+                .category(dto.getCategory())
+                .fileName(fileName)
+                .fileUrl(dto.getFileUrl())
                 .fileType(fileType)
                 .fileSize(fileSize)
                 .uploadedBy(currentUser)
-                .status(DocumentStatus.UPLOADING) // Trạng thái đang upload
                 .build();
 
         document = documentRepository.save(document);
-
-        asyncUploadService.uploadFileToCloudinary(document.getId(), fileBytes, originalFilename);
 
         // Publish event
         eventPublisher.publishEvent(new DocumentCreatedEvent(document.getId(), document));
@@ -109,61 +111,53 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     @CachePut(value = "documents", key = "#dto.id")
-    @CacheEvict(value = "documents", allEntries = true)
-    public DocumentResponseDto updateDocument(DocumentUpdateRequestDto dto, MultipartFile file) throws IOException {
+    @CacheEvict(value = "documents", key = "'all'")
+    public DocumentResponseDto updateDocument(DocumentUpdateRequestDto dto) {
         Document document = documentRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Document with id " + dto.getId() + " not found"));
 
         if (dto.getTitle() != null)
             document.setTitle(dto.getTitle());
         if (dto.getCategory() != null)
-            document.setCategory(Document.DocumentCategory.fromValue(dto.getCategory()));
+            document.setCategory(dto.getCategory());
 
-        if (file != null && !file.isEmpty()) {
-            // === CÓ FILE MỚI: CẬP NHẬT VÀ UPLOAD LẠI FILE ===
-            // Lấy byte[] ngay lập tức
-            byte[] fileBytes = file.getBytes();
-            String originalFilename = file.getOriginalFilename();
+        if (dto.getFileUrl() != null) {
+            document.setFileUrl(dto.getFileUrl());
 
-            // Cập nhật các trường thông tin file và trạng thái
-            document.setFileName(originalFilename);
-            document.setFileType(file.getContentType());
-            document.setFileSize(file.getSize());
-            document.setStatus(DocumentStatus.UPLOADING); // Đặt trạng thái
-            document.setFileUrl(null); // Xóa URL cũ, chờ URL mới
+            if (dto.getFileName() == null || dto.getFileType() == null || dto.getFileSize() == null) {
+                try {
+                    var response = cloudinaryUtils.getMetadata(dto.getFileUrl());
+                    if (dto.getFileName() == null)
+                        document.setFileName(response.get("original_filename") + "." + response.get("format"));
+                    else
+                        document.setFileName(dto.getFileName());
 
-            // Lưu vào DB (Nhanh)
-            document = documentRepository.save(document);
+                    if (dto.getFileType() == null)
+                        document.setFileType(CloudinaryUtils.mapFormatToMimeType((String) response.get("format")));
+                    else
+                        document.setFileType(dto.getFileType());
 
-            // "Bắn" (Fire) tác vụ upload bất đồng bộ (Nhanh)
-            asyncUploadService.uploadFileToCloudinary(document.getId(), fileBytes, originalFilename);
+                    if (dto.getFileSize() == null)
+                        document.setFileSize(((Number) response.get("bytes")).longValue());
+                    else
+                        document.setFileSize(dto.getFileSize());
 
-            // Publish event (Nhanh)
-            eventPublisher.publishEvent(new DocumentUpdatedEvent(document.getId(), document));
-
-            // Trả về DTO ngay
-            return toDto(document);
-
-        } else {
-            // === KHÔNG CÓ FILE MỚI: CHỈ CẬP NHẬT METADATA ===
-            // (Giữ logic cũ của bạn nếu DTO có thể ghi đè URL/tên file)
-            if (dto.getFileName() != null)
+                } catch (Exception e) {
+                    System.err.println("⚠️ Failed to fetch metadata from Cloudinary: " + e.getMessage());
+                }
+            } else {
                 document.setFileName(dto.getFileName());
-            if (dto.getFileUrl() != null)
-                document.setFileUrl(dto.getFileUrl());
-            if (dto.getFileType() != null)
                 document.setFileType(dto.getFileType());
-            if (dto.getFileSize() != null)
                 document.setFileSize(dto.getFileSize());
-
-            // Lưu vào DB (Nhanh)
-            document = documentRepository.save(document);
-
-            // Publish event
-            eventPublisher.publishEvent(new DocumentUpdatedEvent(document.getId(), document));
-
-            return toDto(document);
+            }
         }
+
+        document = documentRepository.save(document);
+
+        // Publish event
+        eventPublisher.publishEvent(new DocumentUpdatedEvent(document.getId(), document));
+
+        return toDto(document);
     }
 
     // ===================== Delete =====================
@@ -174,17 +168,10 @@ public class DocumentServiceImpl implements DocumentService {
         Document document = documentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Document with id " + id + " not found"));
 
-        // 🔹 Xoá file trên Cloudinary (nếu có)
         if (document.getFileUrl() != null) {
-            try {
-                String publicId = CloudinaryUtils.extractPublicId(document.getFileUrl());
-                cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-            } catch (Exception e) {
-                // throw new RuntimeException("Failed to delete file from Cloudinary: " +
-                // e.getMessage());
-                System.err.println("⚠️ Failed to delete file from Cloudinary: " + e.getMessage());
-            }
+            cloudinaryUtils.deleteFile(document.getFileUrl());
         }
+
         documentRepository.delete(document);
         // Publish event
         eventPublisher.publishEvent(new DocumentDeletedEvent(id));
@@ -202,7 +189,7 @@ public class DocumentServiceImpl implements DocumentService {
         return DocumentResponseDto.builder()
                 .id(document.getId())
                 .title(document.getTitle())
-                .category(document.getCategory().getValue())
+                .category(document.getCategory())
                 .fileName(document.getFileName())
                 .fileUrl(document.getFileUrl())
                 .fileType(document.getFileType())
@@ -210,7 +197,6 @@ public class DocumentServiceImpl implements DocumentService {
                 .createdAt(document.getCreatedAt())
                 .updatedAt(document.getUpdatedAt())
                 .uploadedBy(uploadedByDto)
-                .status(document.getStatus().name())
                 .build();
     }
 }

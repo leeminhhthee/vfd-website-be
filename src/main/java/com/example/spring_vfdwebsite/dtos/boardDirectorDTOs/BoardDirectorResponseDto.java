@@ -36,7 +36,7 @@ public class BoardDirectorResponseDto {
 
     @Schema(description = "Image URL or Base64 encoded string representing the director’s photo",
             example = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...")
-    private String image;
+    private String imageUrl;
 
     @Schema(description = "Timestamp when the record was created", example = "2025-01-15T10:30:00")
     private LocalDateTime createdAt;
