@@ -3,8 +3,7 @@ package com.example.spring_vfdwebsite.entities;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.example.spring_vfdwebsite.entities.enums.DocumentCategoryEnum;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -20,34 +19,6 @@ import lombok.*;
 @Table(name = "documents")
 public class Document extends BaseEntity {
 
-    public enum DocumentCategory {
-        PLAN("plan"),
-        CHARTER("charter"),
-        FORMS("forms"),
-        REGULATIONS("regulations");
-
-        private final String value;
-
-        DocumentCategory(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        public String getValue() {
-            return value;
-        }
-
-        @JsonCreator
-        public static DocumentCategory fromValue(String value) {
-            for (DocumentCategory type : DocumentCategory.values()) {
-                if (type.value.equalsIgnoreCase(value)) {
-                    return type;
-                }
-            }
-            throw new IllegalArgumentException("Invalid category: " + value);
-        }
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -61,7 +32,7 @@ public class Document extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "category", nullable = false)
-    private DocumentCategory category;
+    private DocumentCategoryEnum category;
 
     @Column(name = "file_name")
     private String fileName;

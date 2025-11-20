@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@Tag(name = "User Management", description = "APIs for managing users")
+@Tag(name = "User Controller", description = "API endpoints for managing users")
 public class UserController {
 
     private final UserService userService;
@@ -64,7 +64,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public UserResponseDto updateUser(@PathVariable("id") Integer id, @Valid @RequestBody UserUpdateRequestDto dto) {
         dto.setId(id); // ensure DTO has ID
-        return userService.updateUser(dto);
+        return userService.updateUser(id, dto);
     }
 
     @Operation(summary = "Delete a user")

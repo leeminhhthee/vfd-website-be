@@ -50,7 +50,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     // ===================== Get By Id =====================
     @Override
-    @Cacheable(value = "documents", key = "#id")
+    @Cacheable(value = "documents", key = "#root.args[0]")
     @Transactional(readOnly = true)
     public DocumentResponseDto getDocumentById(Integer id) {
         Document document = documentRepository.findById(id)
@@ -110,11 +110,11 @@ public class DocumentServiceImpl implements DocumentService {
     // ===================== Update =====================
     @Override
     @Transactional
-    @CachePut(value = "documents", key = "#dto.id")
+    @CachePut(value = "documents", key = "#p0")
     @CacheEvict(value = "documents", key = "'all'")
-    public DocumentResponseDto updateDocument(DocumentUpdateRequestDto dto) {
-        Document document = documentRepository.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Document with id " + dto.getId() + " not found"));
+    public DocumentResponseDto updateDocument(Integer id, DocumentUpdateRequestDto dto) {
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Document with id " + id + " not found"));
 
         if (dto.getTitle() != null)
             document.setTitle(dto.getTitle());

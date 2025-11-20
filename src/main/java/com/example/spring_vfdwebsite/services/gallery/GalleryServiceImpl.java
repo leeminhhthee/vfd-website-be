@@ -46,7 +46,7 @@ public class GalleryServiceImpl implements GalleryService {
 
     // ===================== Get By Id =====================
     @Override
-    @Cacheable(value = "galleries", key = "#id")
+    @Cacheable(value = "galleries", key = "#root.args[0]")
     @Transactional(readOnly = true)
     public GalleryResponseDto getGalleryById(Integer id) {
         return galleryRepository.findById(id)
@@ -78,7 +78,7 @@ public class GalleryServiceImpl implements GalleryService {
     @Override
     @Transactional
     @CacheEvict(value = "galleries", allEntries = true)
-    @CachePut(value = "galleries", key = "#dto.id")
+    @CachePut(value = "galleries", key = "#p0")
     public GalleryResponseDto updateGallery(Integer id, GalleryUpdateRequestDto dto) {
         Gallery gallery = galleryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Gallery not found with id " + id));

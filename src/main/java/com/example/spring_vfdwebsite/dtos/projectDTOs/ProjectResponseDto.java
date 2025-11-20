@@ -2,7 +2,8 @@ package com.example.spring_vfdwebsite.dtos.projectDTOs;
 
 import java.time.LocalDateTime;
 
-import com.example.spring_vfdwebsite.entities.Project.ProjectCategory;
+import com.example.spring_vfdwebsite.entities.enums.ProjectCategoryEnum;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -41,7 +42,7 @@ public class ProjectResponseDto {
             example = "development",
             allowableValues = {"development", "infrastructure", "collaboration", "training", "community"}
     )
-    private ProjectCategory category;
+    private ProjectCategoryEnum category;
 
     @Schema(description = "Timestamp when the project record was created", example = "2025-01-10T10:15:30")
     private LocalDateTime createdAt;

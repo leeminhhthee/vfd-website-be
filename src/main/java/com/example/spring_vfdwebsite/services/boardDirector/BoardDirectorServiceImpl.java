@@ -77,7 +77,7 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
 
     // Get director by ID
     @Override
-    @Cacheable(value = "board-directors", key = "#id")
+    @Cacheable(value = "board-directors", key = "#root.args[0]")
     public BoardDirectorResponseDto getBoardDirectorById(Integer id) {
         return boardDirectorRepository.findById(id)
                 .map(this::toDto)
@@ -86,14 +86,14 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
 
     // Update director
     @Override
-    @CachePut(value = "board-directors", key = "#updateDto.id")
+    @CachePut(value = "board-directors", key = "#p0")
     @CacheEvict(value = "board-directors", key = "'all'")
-    public BoardDirectorResponseDto updateBoardDirector(BoardDirectorUpdateRequestDto updateDto) {
-        BoardDirector director = boardDirectorRepository.findById(updateDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("BoardDirector with id " + updateDto.getId()));
+    public BoardDirectorResponseDto updateBoardDirector(Integer id, BoardDirectorUpdateRequestDto updateDto) {
+        BoardDirector director = boardDirectorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("BoardDirector with id " + id));
         if (updateDto.getEmail() != null) {
             List<BoardDirector> found = boardDirectorRepository.findByEmail(updateDto.getEmail());
-            if (!found.isEmpty() && !found.get(0).getId().equals(updateDto.getId())) {
+            if (!found.isEmpty() && !found.get(0).getId().equals(id)) {
                 throw new EntityDuplicateException("BoardDirector");
             }
             director.setEmail(updateDto.getEmail());

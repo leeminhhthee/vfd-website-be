@@ -1,6 +1,7 @@
 package com.example.spring_vfdwebsite.dtos.projectDTOs;
 
-import com.example.spring_vfdwebsite.entities.Project.ProjectCategory;
+import com.example.spring_vfdwebsite.entities.enums.ProjectCategoryEnum;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -13,7 +14,7 @@ import lombok.*;
 @Builder
 @Schema(description = "DTO for updating an existing Project")
 public class ProjectUpdateRequestDto {
-    @Schema(description = "ID of the project to update", example = "1", required = true)
+    @Schema(description = "ID of the project to update", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer id;
 
     @Schema(description = "Updated title of the project", example = "Dự án phát triển bóng chuyền trẻ nâng cao")
@@ -41,5 +42,5 @@ public class ProjectUpdateRequestDto {
 
     @Schema(description = "Updated project category", example = "infrastructure", allowableValues = { "development",
             "infrastructure", "collaboration", "training", "community" })
-    private ProjectCategory category;
+    private ProjectCategoryEnum category;
 }

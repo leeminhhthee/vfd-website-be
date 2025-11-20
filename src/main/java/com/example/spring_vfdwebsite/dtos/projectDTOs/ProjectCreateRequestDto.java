@@ -1,6 +1,6 @@
 package com.example.spring_vfdwebsite.dtos.projectDTOs;
 
-import com.example.spring_vfdwebsite.entities.Project.ProjectCategory;
+import com.example.spring_vfdwebsite.entities.enums.ProjectCategoryEnum;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +15,7 @@ import lombok.*;
 @Builder
 @Schema(description = "DTO for creating a new Project")
 public class ProjectCreateRequestDto {
-    @Schema(description = "Title of the project", example = "Dự án phát triển bóng chuyền trẻ", required = true)
+    @Schema(description = "Title of the project", example = "Dự án phát triển bóng chuyền trẻ", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Title is required")
     @Size(max = 255)
     private String title;
@@ -40,7 +40,7 @@ public class ProjectCreateRequestDto {
     private String imageUrl;
 
     @Schema(description = "Category of the project", example = "development", allowableValues = { "development",
-            "infrastructure", "collaboration", "training", "community" }, required = true)
+            "infrastructure", "collaboration", "training", "community" }, requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Category is required")
-    private ProjectCategory category;
+    private ProjectCategoryEnum category;
 }

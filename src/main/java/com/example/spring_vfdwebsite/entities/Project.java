@@ -1,8 +1,7 @@
 package com.example.spring_vfdwebsite.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.example.spring_vfdwebsite.entities.enums.ProjectCategoryEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,35 +16,6 @@ import lombok.*;
 @Builder
 @Table(name = "projects")
 public class Project extends BaseEntity {
-
-    public enum ProjectCategory {
-        PHAT_TRIEN("development"),
-        CO_SO_HA_TANG("infrastructure"),
-        HOP_TAC("collaboration"),
-        DAO_TAO("training"),
-        CONG_DONG("community");
-
-        private final String value;
-
-        ProjectCategory(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        public String getValue() {
-            return value;
-        }
-
-        @JsonCreator
-        public static ProjectCategory fromValue(String value) {
-            for (ProjectCategory type : ProjectCategory.values()) {
-                if (type.value.equalsIgnoreCase(value)) {
-                    return type;
-                }
-            }
-            throw new IllegalArgumentException("Invalid category: " + value);
-        }
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,5 +51,5 @@ public class Project extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "category", nullable = false)
-    private ProjectCategory category;
+    private ProjectCategoryEnum category;
 }

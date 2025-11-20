@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
 
     // Get user by ID
     @Override
-    @Cacheable(value = "users", key = "#id")
+    @Cacheable(value = "users", key = "#root.args[0]")
     public UserResponseDto getUserById(Integer id) {
         return userRepository.findById(id)
                 .map(this::toDto)
@@ -122,15 +122,15 @@ public class UserServiceImpl implements UserService {
 
     // Update user
     @Override
-    @CachePut(value = "users", key = "#updateDto.id")
+    @CachePut(value = "users", key = "#p0")
     @CacheEvict(value = "users", key = "'all'")
-    public UserResponseDto updateUser(UserUpdateRequestDto updateDto) {
-        User user = userRepository.findById(updateDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + updateDto.getId()));
+    public UserResponseDto updateUser(Integer id, UserUpdateRequestDto updateDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
 
         if (updateDto.getEmail() != null) {
             List<User> found = userRepository.findByEmail(updateDto.getEmail());
-            if (!found.isEmpty() && !found.get(0).getId().equals(updateDto.getId())) {
+            if (!found.isEmpty() && !found.get(0).getId().equals(id)) {
                 throw new EntityDuplicateException("User");
             }
             user.setEmail(updateDto.getEmail());

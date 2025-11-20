@@ -14,7 +14,7 @@ public interface PartnerService {
 
     PartnerResponseDto getPartnerById(Integer id);
 
-    PartnerResponseDto updatePartner(PartnerUpdateRequestDto dto);
+    PartnerResponseDto updatePartner(Integer id, PartnerUpdateRequestDto dto);
 
     void deletePartner(Integer id);
 }

@@ -13,7 +13,7 @@ import lombok.*;
 @Schema(description = "DTO for updating an existing Affected Object")
 public class AffectedObjectUpdateRequestDto {
 
-    @Schema(description = "Unique identifier of the affected object to update", example = "1", required = true)
+    @Schema(description = "Unique identifier of the affected object to update", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer id;
 
     @Schema(description = "Title or name of the affected object", example = "Main Stadium Renovation")

@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/projects")
 @RequiredArgsConstructor
-@Tag(name = "Project", description = "APIs for managing projects")
+@Tag(name = "Project Controller", description = "API endpoints for managing projects")
 public class ProjectController {
     private final ProjectService projectService;
 
@@ -69,7 +69,7 @@ public class ProjectController {
             @PathVariable("id") Integer id,
             @RequestBody ProjectUpdateRequestDto dto) {
         dto.setId(id);
-        ProjectResponseDto updatedProject = projectService.updateProject(dto);
+        ProjectResponseDto updatedProject = projectService.updateProject(id, dto);
         return ResponseEntity.ok(updatedProject);
     }
 

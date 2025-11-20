@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/documents")
 @RequiredArgsConstructor
-@Tag(name = "Document", description = "APIs for managing documents")
+@Tag(name = "Document Controller", description = "API endpoints for managing documents")
 public class DocumentController {
 
         private final DocumentService documentService;
@@ -72,7 +72,7 @@ public class DocumentController {
                         @RequestBody DocumentUpdateRequestDto dto) {
 
                 dto.setId(id);
-                DocumentResponseDto updatedDocument = documentService.updateDocument(dto);
+                DocumentResponseDto updatedDocument = documentService.updateDocument(id, dto);
                 return ResponseEntity.ok(updatedDocument);
         }
 

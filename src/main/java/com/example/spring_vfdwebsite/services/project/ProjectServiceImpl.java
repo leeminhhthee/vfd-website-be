@@ -46,7 +46,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     // ===================== Get By Id =====================
     @Override
-    @Cacheable(value = "projects", key = "#id")
+    @Cacheable(value = "projects", key = "#root.args[0]")
     @Transactional(readOnly = true)
     public ProjectResponseDto getProjectById(Integer id) {
         Project project = projectRepository.findById(id)
@@ -79,11 +79,11 @@ public class ProjectServiceImpl implements ProjectService {
     // ===================== Update =====================
     @Override
     @Transactional
-    @CachePut(value = "projects", key = "#dto.id")
+    @CachePut(value = "projects", key = "#p0")
     @CacheEvict(value = { "projects" }, allEntries = true)
-    public ProjectResponseDto updateProject(ProjectUpdateRequestDto dto) {
-        Project project = projectRepository.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Project with id " + dto.getId() + " not found"));
+    public ProjectResponseDto updateProject(Integer id, ProjectUpdateRequestDto dto) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project with id " + id + " not found"));
 
         if (dto.getTitle() != null)
             project.setTitle(dto.getTitle());

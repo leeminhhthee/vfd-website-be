@@ -1,6 +1,6 @@
 package com.example.spring_vfdwebsite.dtos.documentDTOs;
 
-import com.example.spring_vfdwebsite.entities.Document.DocumentCategory;
+import com.example.spring_vfdwebsite.entities.enums.DocumentCategoryEnum;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -15,14 +15,14 @@ import lombok.*;
 @Schema(description = "DTO for creating a new Document")
 public class DocumentCreateRequestDto {
 
-    @Schema(description = "Title of the document", example = "Kế hoạch Giải Bóng chuyền Cup CLB TP Đà Nẵng 2025", required = true)
+    @Schema(description = "Title of the document", example = "Kế hoạch Giải Bóng chuyền Cup CLB TP Đà Nẵng 2025", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "title is required")
     @Size(max = 255, message = "title must be less than 255 characters")
     private String title;
 
-    @Schema(description = "Category of the document: plan, charter, forms, regulations", example = "plan", required = true)
+    @Schema(description = "Category of the document: plan, charter, forms, regulations", example = "plan", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "category is required")
-    private DocumentCategory category;
+    private DocumentCategoryEnum category;
 
     @Schema(description = "Original file name stored on Cloudinary", example = "ke-hoach-2025.pdf")
     private String fileName;

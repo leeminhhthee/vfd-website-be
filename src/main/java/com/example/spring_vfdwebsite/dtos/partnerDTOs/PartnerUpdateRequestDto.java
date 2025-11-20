@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Schema(description = "DTO for updating an existing Partner")
 public class PartnerUpdateRequestDto {
 
-    @Schema(description = "Unique identifier of the partner to update", example = "1", required = true)
+    @Schema(description = "Unique identifier of the partner to update", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Partner ID is required")
     private Integer id;
 

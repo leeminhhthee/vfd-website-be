@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/partners")
 @RequiredArgsConstructor
-@Tag(name = "Partners", description = "APIs for managing partners")
+@Tag(name = "Partner Controller", description = "API endpoints for managing partners")
 public class PartnerController {
 
     private final PartnerService partnerService;
@@ -61,7 +61,7 @@ public class PartnerController {
             @PathVariable("id") Integer id,
             @RequestBody PartnerUpdateRequestDto dto) {
         dto.setId(id);
-        PartnerResponseDto updated = partnerService.updatePartner(dto);
+        PartnerResponseDto updated = partnerService.updatePartner(id, dto);
         return ResponseEntity.ok(updated);
     }
 

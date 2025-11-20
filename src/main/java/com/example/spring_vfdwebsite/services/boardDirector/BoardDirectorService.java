@@ -33,7 +33,7 @@ public interface BoardDirectorService {
      * @param updateDto DTO containing updated information
      * @return BoardDirectorResponseDto of the updated board director
      */
-    BoardDirectorResponseDto updateBoardDirector(BoardDirectorUpdateRequestDto updateDto);
+    BoardDirectorResponseDto updateBoardDirector(Integer id, BoardDirectorUpdateRequestDto updateDto);
 
     /**
      * Delete a board director by ID.

@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/heroes")
-@Tag(name = "Hero", description = "APIs for managing hero banners")
+@Tag(name = "Hero Controller", description = "API endpoints for managing hero banners")
 public class HeroController {
 
     private final HeroService heroService;
@@ -87,7 +87,7 @@ public class HeroController {
             @Valid @RequestBody HeroUpdateRequestDto dto
     ) {
         dto.setId(id); // assign id
-        return ResponseEntity.ok(heroService.updateHero(dto));
+        return ResponseEntity.ok(heroService.updateHero(id, dto));
     }
 
     // ===================== DELETE =====================

@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Schema(description = "DTO for creating a new Partner")
 public class PartnerCreateRequestDto {
 
-    @Schema(description = "Name of the partner", example = "FPT Software", required = true)
+    @Schema(description = "Name of the partner", example = "FPT Software", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Name is required")
     @Size(max = 100, message = "Name must not exceed 100 characters")
     private String name;

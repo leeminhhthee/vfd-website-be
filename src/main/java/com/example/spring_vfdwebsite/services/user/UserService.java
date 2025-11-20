@@ -33,7 +33,7 @@ public interface UserService {
 	 * @param updateDto DTO containing updated information
 	 * @return UserResponseDto of the updated user
 	 */
-	UserResponseDto updateUser(UserUpdateRequestDto updateDto);
+	UserResponseDto updateUser(Integer id, UserUpdateRequestDto updateDto);
 
 	/**
 	 * Delete a user by ID.

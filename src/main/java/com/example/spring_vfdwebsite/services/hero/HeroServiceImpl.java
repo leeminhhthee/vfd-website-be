@@ -45,7 +45,7 @@ public class HeroServiceImpl implements HeroService {
 
     // ===================== Get By Id =====================
     @Override
-    @Cacheable(value = "heroes", key = "#id")
+    @Cacheable(value = "heroes", key = "#root.args[0]")
     // @Transactional(readOnly = true)
     public HeroResponseDto getHeroById(Integer id) {
         Hero hero = heroRepository.findById(id)
@@ -78,11 +78,11 @@ public class HeroServiceImpl implements HeroService {
     // ===================== Update =====================
     @Override
     @Transactional
-    @CachePut(value = "heroes", key = "#dto.id")
+    @CachePut(value = "heroes", key = "#p0")
     @CacheEvict(value = "heroes", key = "'all'")
-    public HeroResponseDto updateHero(HeroUpdateRequestDto dto) {
-        Hero hero = heroRepository.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Hero with id " + dto.getId()));
+    public HeroResponseDto updateHero(Integer id, HeroUpdateRequestDto dto) {
+        Hero hero = heroRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Hero with id " + id + " not found"));
 
         if (dto.getTitle() != null)
             hero.setTitle(dto.getTitle());

@@ -14,7 +14,7 @@ public interface ProjectService {
 
     ProjectResponseDto createProject(ProjectCreateRequestDto dto);
 
-    ProjectResponseDto updateProject(ProjectUpdateRequestDto dto);
+    ProjectResponseDto updateProject(Integer id, ProjectUpdateRequestDto dto);
 
     void deleteProject(Integer id);
     

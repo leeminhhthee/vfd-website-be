@@ -9,7 +9,7 @@ import com.example.spring_vfdwebsite.dtos.affectedObjectDTOs.AffectedObjectUpdat
 public interface AffectedObjectService {
     AffectedObjectResponseDto createAffectedObject(AffectedObjectCreateRequestDto dto);
 
-    AffectedObjectResponseDto updateAffectedObject(AffectedObjectUpdateRequestDto dto);
+    AffectedObjectResponseDto updateAffectedObject(Integer id, AffectedObjectUpdateRequestDto dto);
 
     void deleteAffectedObject(Integer id);
 

@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/affected-objects")
 @RequiredArgsConstructor
-@Tag(name = "Affected Object", description = "APIs for managing affected objects")
+@Tag(name = "Affected Object Controller", description = "API endpoints for managing affected objects")
 public class AffectedObjectController {
 
     private final AffectedObjectService service;
@@ -59,7 +59,7 @@ public class AffectedObjectController {
     public ResponseEntity<AffectedObjectResponseDto> update(
             @PathVariable("id") Integer id,
             @Valid @RequestBody AffectedObjectUpdateRequestDto dto) {
-        AffectedObjectResponseDto updated = service.updateAffectedObject(dto);
+        AffectedObjectResponseDto updated = service.updateAffectedObject(id, dto);
         return ResponseEntity.ok(updated);
     }
 

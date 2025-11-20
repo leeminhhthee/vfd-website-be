@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/board-directors")
-@Tag(name = "Board Director Management", description = "APIs for managing board directors")
+@Tag(name = "Board Director Controller", description = "API endpoints for managing board directors")
 //@SecurityRequirement(name = "bearerAuth")
 public class BoardDirectorController {
 
@@ -68,7 +68,7 @@ public class BoardDirectorController {
             @PathVariable("id") Integer id,
             @Valid @RequestBody BoardDirectorUpdateRequestDto dto) {
         dto.setId(id); // đảm bảo DTO có ID
-        return boardDirectorService.updateBoardDirector(dto);
+        return boardDirectorService.updateBoardDirector(id, dto);
     }
 
     @Operation(summary = "Delete a board director")

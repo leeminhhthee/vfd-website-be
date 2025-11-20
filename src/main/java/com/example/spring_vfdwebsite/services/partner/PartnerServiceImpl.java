@@ -74,7 +74,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     // ===== Get partner by ID =====
     @Override
-    @Cacheable(value = "partners", key = "#id")
+    @Cacheable(value = "partners", key = "#root.args[0]")
     public PartnerResponseDto getPartnerById(Integer id) {
         Partner partner = partnerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Partner with id " + id));
@@ -84,11 +84,11 @@ public class PartnerServiceImpl implements PartnerService {
     // ===== Update partner =====
     @Override
     @Transactional
-    @CachePut(value = "partners", key = "#updateRequestDto.id")
+    @CachePut(value = "partners", key = "#p0")
     @CacheEvict(value = "partners", key = "'all'")
-    public PartnerResponseDto updatePartner(PartnerUpdateRequestDto updateRequestDto) {
-        Partner partner = partnerRepository.findById(updateRequestDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Partner with id " + updateRequestDto.getId()));
+    public PartnerResponseDto updatePartner(Integer id,PartnerUpdateRequestDto updateRequestDto) {
+        Partner partner = partnerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Partner with id " + id + " not found"));
 
         if (updateRequestDto.getName() != null)
             partner.setName(updateRequestDto.getName());

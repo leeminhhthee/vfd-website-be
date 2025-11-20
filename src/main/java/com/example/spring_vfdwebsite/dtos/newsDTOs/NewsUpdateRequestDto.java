@@ -15,7 +15,7 @@ import lombok.*;
 @Schema(description = "DTO for updating an existing News")
 public class NewsUpdateRequestDto {
 
-    @Schema(description = "Unique identifier of the news to update", example = "1", required = true)
+    @Schema(description = "Unique identifier of the news to update", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer id;
 
     @Size(max = 255, message = "Title must be at most 255 characters")

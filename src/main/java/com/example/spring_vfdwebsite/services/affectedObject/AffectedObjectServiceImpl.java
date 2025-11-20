@@ -52,13 +52,13 @@ public class AffectedObjectServiceImpl implements AffectedObjectService {
 
     // Update
     @Override
-    @CachePut(value = "affected-objects", key = "#affectedObjectUpdateRequestDto.id")
+    @CachePut(value = "affected-objects", key = "#p0")
     @CacheEvict(value = "affected-objects", key = "'all'")
-    public AffectedObjectResponseDto updateAffectedObject(
+    public AffectedObjectResponseDto updateAffectedObject(Integer id, 
             AffectedObjectUpdateRequestDto affectedObjectUpdateRequestDto) {
-        AffectedObject obj = affectedObjectRepository.findById(affectedObjectUpdateRequestDto.getId())
+        AffectedObject obj = affectedObjectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "AffectedObject with id " + affectedObjectUpdateRequestDto.getId() + " not found"));
+                        "AffectedObject with id " + id + " not found"));
 
         if (affectedObjectUpdateRequestDto.getTitle() != null)
             obj.setTitle(affectedObjectUpdateRequestDto.getTitle());
@@ -92,8 +92,9 @@ public class AffectedObjectServiceImpl implements AffectedObjectService {
 
     // Get by ID
     @Override
-    @Cacheable(value = "affected-objects", key = "#id")
+    @Cacheable(value = "affected-objects", key = "#root.args[0]")
     public AffectedObjectResponseDto getAffectedObjectById(Integer id) {
+        System.out.println("Cache key = " + id);
         return affectedObjectRepository.findById(id)
                 .map(this::toDto)
                 .orElseThrow(() -> new EntityNotFoundException("AffectedObject with id " + id + " not found"));

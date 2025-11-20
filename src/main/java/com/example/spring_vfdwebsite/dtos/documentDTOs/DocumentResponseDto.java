@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-import com.example.spring_vfdwebsite.entities.Document.DocumentCategory;
+import com.example.spring_vfdwebsite.entities.enums.DocumentCategoryEnum;
 
 @Getter
 @Setter
@@ -22,7 +22,7 @@ public class DocumentResponseDto {
     private String title;
 
     @Schema(description = "Category of the document", example = "plan")
-    private DocumentCategory category;
+    private DocumentCategoryEnum category;
 
     @Schema(description = "File name stored on Cloudinary", example = "document_001.pdf")
     private String fileName;

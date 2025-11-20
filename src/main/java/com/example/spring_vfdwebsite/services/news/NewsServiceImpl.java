@@ -50,7 +50,7 @@ public class NewsServiceImpl implements NewsService {
 
     // ===================== Get By Id =====================
     @Override
-    @Cacheable(value = "news", key = "#id")
+    @Cacheable(value = "news", key = "#root.args[0]")
     @Transactional(readOnly = true)
     public NewsResponseDto getNewsById(Integer id) {
         News news = newsRepository.findById(id)
@@ -89,7 +89,7 @@ public class NewsServiceImpl implements NewsService {
     // ==================== Update =====================
     @Override
     @Transactional
-    @CachePut(value = "news", key = "#dto.id")
+    @CachePut(value = "news", key = "#p0")
     @CacheEvict(value = "news", allEntries = true)
     public NewsResponseDto updateNews(Integer id, NewsUpdateRequestDto dto) {
         News news = newsRepository.findById(id)

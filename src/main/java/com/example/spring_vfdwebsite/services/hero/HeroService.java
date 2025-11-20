@@ -11,7 +11,7 @@ public interface HeroService {
 
     HeroResponseDto createHero(HeroCreateRequestDto dto);
 
-    HeroResponseDto updateHero(HeroUpdateRequestDto dto);
+    HeroResponseDto updateHero(Integer id, HeroUpdateRequestDto dto);
 
     void deleteHero(Integer id);
 }

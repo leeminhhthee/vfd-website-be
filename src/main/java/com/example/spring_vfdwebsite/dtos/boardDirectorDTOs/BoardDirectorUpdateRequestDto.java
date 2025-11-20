@@ -14,7 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 public class BoardDirectorUpdateRequestDto {
 
-    @Schema(description = "Unique identifier of the board director to update", example = "1")
+    @Schema(description = "Unique identifier of the board director to update", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "ID is required")
     private Integer id;
 

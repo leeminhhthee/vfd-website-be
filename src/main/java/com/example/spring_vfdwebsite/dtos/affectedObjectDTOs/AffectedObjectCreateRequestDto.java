@@ -14,7 +14,7 @@ import lombok.*;
 @Schema(description = "DTO for creating a new Affected Object")
 public class AffectedObjectCreateRequestDto {
 
-    @Schema(description = "Title or name of the affected object", example = "Main Stadium Renovation", required = true)
+    @Schema(description = "Title or name of the affected object", example = "Main Stadium Renovation", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "Title is required")
     @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;

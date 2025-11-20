@@ -2,7 +2,8 @@ package com.example.spring_vfdwebsite.dtos.galleryDTOs;
 
 import java.util.List;
 
-import com.example.spring_vfdwebsite.entities.Gallery.GalleryCategory;
+import com.example.spring_vfdwebsite.entities.enums.GalleryCategoryEnum;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +25,7 @@ public class GalleryCreateRequestDto {
 
     @NotNull(message = "Category must not be null")
     @Schema(description = "Gallery category", example = "insite", allowableValues = { "insite", "team", "other" })
-    private GalleryCategory category;
+    private GalleryCategoryEnum category;
 
     @NotNull(message = "Images must not be null")
     @Schema(description = "List of image URLs uploaded from frontend", example = "[\"https://res.cloudinary.com/.../img1.jpg\", \"https://res.cloudinary.com/.../img2.jpg\"]")

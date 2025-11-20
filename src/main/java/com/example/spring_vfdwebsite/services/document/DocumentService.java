@@ -14,7 +14,7 @@ public interface DocumentService {
 
     DocumentResponseDto createDocument(DocumentCreateRequestDto dto);
 
-    DocumentResponseDto updateDocument(DocumentUpdateRequestDto dto);
+    DocumentResponseDto updateDocument(Integer id, DocumentUpdateRequestDto dto);
 
     void deleteDocument(Integer id);
 }
