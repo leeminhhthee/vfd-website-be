@@ -15,7 +15,7 @@ public class CacheConfig {
     public CacheManager cacheManager() {
         ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager();
         // Có thể thêm các cache names nếu cần
-        cacheManager.setCacheNames(Arrays.asList("users", "board-directors", "affected-objects", "partners", "heroes", "documents", "projects", "galleries"));
+        cacheManager.setCacheNames(Arrays.asList("users", "board-directors", "affected-objects", "partners", "heroes", "documents", "projects", "galleries", "news"));
         return cacheManager;
     }
 }

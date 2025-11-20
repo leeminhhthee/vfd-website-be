@@ -44,7 +44,7 @@ public class BoardDirector extends BaseEntity {
     private String term;
 
     @Lob
-    @Column(name = "bio")
+    @Column(name = "bio", columnDefinition = "LONGTEXT")
     private String bio;
 
     @Size(max = 500)

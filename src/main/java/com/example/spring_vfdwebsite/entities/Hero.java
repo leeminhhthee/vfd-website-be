@@ -24,7 +24,7 @@ public class Hero extends BaseEntity {
     private String title;
 
     @Lob
-    @Column(name = "sub_title")
+    @Column(name = "sub_title", columnDefinition = "LONGTEXT")
     private String subTitle;
 
     @Size(max = 500)

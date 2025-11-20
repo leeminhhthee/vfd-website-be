@@ -26,7 +26,7 @@ public class AffectedObject extends BaseEntity {
     private String title;
 
     @Lob
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "LONGTEXT")
     private String description;
 
     @Size(max = 500)

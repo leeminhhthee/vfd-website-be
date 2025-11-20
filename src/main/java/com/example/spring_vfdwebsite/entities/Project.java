@@ -58,7 +58,7 @@ public class Project extends BaseEntity {
     private String title;
 
     @Lob
-    @Column(name = "overview")
+    @Column(name = "overview", columnDefinition = "LONGTEXT")
     private String overview;
 
     @Size(max = 100)
