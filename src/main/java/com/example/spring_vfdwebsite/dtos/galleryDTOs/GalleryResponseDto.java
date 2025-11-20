@@ -1,0 +1,36 @@
+package com.example.spring_vfdwebsite.dtos.galleryDTOs;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.example.spring_vfdwebsite.entities.Gallery.GalleryCategory;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+
+@Getter
+@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Schema(description = "Response DTO for Gallery entity")
+public class GalleryResponseDto {
+
+    @Schema(description = "Gallery ID", example = "1")
+    private Integer id;
+
+    @Schema(description = "Gallery title", example = "Nhận quyết định thành lập CLB bóng chuyền cộng đồng")
+    private String title;
+
+    @Schema(description = "Gallery category", example = "other", allowableValues = { "insite", "team", "other" })
+    private GalleryCategory category;
+
+    @Schema(description = "List of image URLs", example = "[\"https://res.cloudinary.com/.../img1.jpg\", \"https://res.cloudinary.com/.../img2.jpg\"]")
+    private List<String> imageUrl;
+
+    @Schema(description = "Timestamp when the project record was created", example = "2025-01-10T10:15:30")
+    private LocalDateTime createdAt;
+
+    @Schema(description = "Timestamp when the project record was last updated", example = "2025-01-15T12:20:45")
+    private LocalDateTime updatedAt;
+}

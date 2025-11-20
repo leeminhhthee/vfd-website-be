@@ -83,9 +83,4 @@ public class Document extends BaseEntity {
     @JoinColumn(name = "uploaded_by", nullable = false)
     private User uploadedBy;
 
-    // @Enumerated(EnumType.STRING)
-    // @NotNull
-    // @Column(name = "status", nullable = false)
-    // private DocumentStatus status;
-
 }
