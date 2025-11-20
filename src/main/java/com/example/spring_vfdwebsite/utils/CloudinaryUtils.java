@@ -1,5 +1,7 @@
 package com.example.spring_vfdwebsite.utils;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.cloudinary.Cloudinary;
@@ -65,6 +67,20 @@ public class CloudinaryUtils {
             cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
         } catch (Exception e) {
             System.err.println("Failed to delete file from Cloudinary: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Delete multiple files from Cloudinary
+     * 
+     * @param fileUrls List of full Cloudinary URLs
+     */
+    public void deleteFiles(List<String> fileUrls) {
+        if (fileUrls == null || fileUrls.isEmpty())
+            return;
+
+        for (String fileUrl : fileUrls) {
+            deleteFile(fileUrl);
         }
     }
 }

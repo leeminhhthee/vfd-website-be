@@ -37,6 +37,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Cacheable(value = "projects", key = "'all'")
     @Transactional(readOnly = true)
     public List<ProjectResponseDto> getAllProjects() {
+        System.out.println("🔥 Fetching all projects from the database...");
         return projectRepository.findAll()
                 .stream()
                 .map(this::toDto)
