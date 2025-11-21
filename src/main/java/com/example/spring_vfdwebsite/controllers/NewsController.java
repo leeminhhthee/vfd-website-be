@@ -62,6 +62,7 @@ public class NewsController {
     @PatchMapping("/{id}")
     @Operation(summary = "Update news", description = "Update news details", responses = {
             @ApiResponse(responseCode = "200", description = "News updated", content = @Content(mediaType = "application/json", schema = @Schema(implementation = NewsResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = "News not found")
     })
     public ResponseEntity<NewsResponseDto> updateNews(
