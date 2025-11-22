@@ -3,15 +3,16 @@ package com.example.spring_vfdwebsite.entities.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum DocumentCategoryEnum {
-    PLAN("plan"),
-    CHARTER("charter"),
-    FORMS("forms"),
-    REGULATIONS("regulations");
+public enum RoundEnum {
+    GROUP("group"),
+    QUARTER_FINAL("quarter-final"),
+    SEMI_FINAL("semi-final"),
+    THIRD_PLACE("third-place"),
+    FINAL("final");
 
     private final String value;
 
-    DocumentCategoryEnum(String value) {
+    RoundEnum(String value) {
         this.value = value;
     }
 
@@ -21,8 +22,8 @@ public enum DocumentCategoryEnum {
     }
 
     @JsonCreator
-    public static DocumentCategoryEnum fromValue(String value) {
-        for (DocumentCategoryEnum type : DocumentCategoryEnum.values()) {
+    public static RoundEnum fromValue(String value) {
+        for (RoundEnum type : RoundEnum.values()) {
             if (type.value.equalsIgnoreCase(value)) {
                 return type;
             }
