@@ -10,7 +10,6 @@ import lombok.*;
 
 @Getter
 @Setter
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -23,7 +22,7 @@ public class GalleryResponseDto {
     @Schema(description = "Gallery title", example = "Nhận quyết định thành lập CLB bóng chuyền cộng đồng")
     private String title;
 
-    @Schema(description = "Gallery category", example = "other", allowableValues = { "insite", "team", "other" })
+    @Schema(description = "Gallery category", example = "other", allowableValues = { "inside", "team", "other" })
     private GalleryCategoryEnum category;
 
     @Schema(description = "List of image URLs", example = "[\"https://res.cloudinary.com/.../img1.jpg\", \"https://res.cloudinary.com/.../img2.jpg\"]")
@@ -34,4 +33,20 @@ public class GalleryResponseDto {
 
     @Schema(description = "Timestamp when the project record was last updated", example = "2025-01-15T12:20:45")
     private LocalDateTime updatedAt;
+
+    @Schema(description = "Basic info of the tournament this gallery belongs to")
+    private TournamentDto tournament;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class TournamentDto {
+        @Schema(description = "ID of the tournament", example = "1")
+        private Integer id;
+
+        @Schema(description = "Name of the tournament", example = "Giải Bóng Chuyền SV6 2025")
+        private String name;
+    }
 }

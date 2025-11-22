@@ -14,11 +14,13 @@ import com.example.spring_vfdwebsite.dtos.galleryDTOs.GalleryCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.galleryDTOs.GalleryUpdateRequestDto;
 import com.example.spring_vfdwebsite.dtos.galleryDTOs.GalleryResponseDto;
 import com.example.spring_vfdwebsite.entities.Gallery;
+import com.example.spring_vfdwebsite.entities.Tournament;
 import com.example.spring_vfdwebsite.events.gallery.GalleryCreatedEvent;
 import com.example.spring_vfdwebsite.events.gallery.GalleryDeletedEvent;
 import com.example.spring_vfdwebsite.events.gallery.GalleryUpdatedEvent;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.GalleryJpaRepository;
+import com.example.spring_vfdwebsite.repositories.TournamentJpaRepository;
 import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class GalleryServiceImpl implements GalleryService {
 
     private final GalleryJpaRepository galleryRepository;
+    private final TournamentJpaRepository tournamentRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final CloudinaryUtils cloudinaryUtils;
 
@@ -60,10 +63,18 @@ public class GalleryServiceImpl implements GalleryService {
     @CacheEvict(value = "galleries", allEntries = true)
     public GalleryResponseDto createGallery(GalleryCreateRequestDto dto) {
 
+        Tournament tournament = null;
+        if (dto.getTournament() != null) {
+            tournament = tournamentRepository.findById(dto.getTournament())
+                    .orElseThrow(
+                            () -> new EntityNotFoundException("Tournament not found with id " + dto.getTournament()));
+        }
+
         Gallery gallery = Gallery.builder()
                 .title(dto.getTitle())
                 .category(dto.getCategory())
                 .imageUrl(dto.getImageUrl())
+                .tournament(tournament)
                 .build();
 
         Gallery savedGallery = galleryRepository.save(gallery);
@@ -132,11 +143,20 @@ public class GalleryServiceImpl implements GalleryService {
 
     // ===================== Mapper entity -> DTO =====================
     private GalleryResponseDto toDto(Gallery gallery) {
+        GalleryResponseDto.TournamentDto tournamentDto = null;
+        if (gallery.getTournament() != null) {
+            tournamentDto = GalleryResponseDto.TournamentDto.builder()
+                    .id(gallery.getTournament().getId())
+                    .name(gallery.getTournament().getName())
+                    .build();
+        }
+
         return GalleryResponseDto.builder()
                 .id(gallery.getId())
                 .title(gallery.getTitle())
                 .category(gallery.getCategory())
                 .imageUrl(gallery.getImageUrl())
+                .tournament(tournamentDto)
                 .createdAt(gallery.getCreatedAt())
                 .updatedAt(gallery.getUpdatedAt())
                 .build();

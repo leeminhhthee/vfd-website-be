@@ -35,11 +35,12 @@ public class Gallery extends BaseEntity {
     private String title;
 
     @ElementCollection
-    @CollectionTable(
-            name = "gallery_images",
-            joinColumns = @JoinColumn(name = "gallery_id")
-    )
+    @CollectionTable(name = "gallery_images", joinColumns = @JoinColumn(name = "gallery_id"))
     @Column(name = "image_url")
     @JsonProperty("images")
     private List<String> imageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "tournament_id", nullable = true)
+    private Tournament tournament;
 }

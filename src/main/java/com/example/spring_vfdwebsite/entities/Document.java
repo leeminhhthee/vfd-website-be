@@ -1,9 +1,13 @@
 package com.example.spring_vfdwebsite.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.example.spring_vfdwebsite.entities.enums.DocumentCategoryEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -54,4 +58,8 @@ public class Document extends BaseEntity {
     @JoinColumn(name = "uploaded_by", nullable = false)
     private User uploadedBy;
 
+    @OneToMany(mappedBy = "document", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
+    private List<TournamentDocument> tournamentDocuments = new ArrayList<>();
 }

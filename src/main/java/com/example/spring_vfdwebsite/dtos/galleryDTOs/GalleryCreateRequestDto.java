@@ -24,10 +24,13 @@ public class GalleryCreateRequestDto {
     private String title;
 
     @NotNull(message = "Category must not be null")
-    @Schema(description = "Gallery category", example = "insite", allowableValues = { "insite", "team", "other" })
+    @Schema(description = "Gallery category", example = "inside", allowableValues = { "inside", "team", "other" })
     private GalleryCategoryEnum category;
 
     @NotNull(message = "Images must not be null")
     @Schema(description = "List of image URLs uploaded from frontend", example = "[\"https://res.cloudinary.com/.../img1.jpg\", \"https://res.cloudinary.com/.../img2.jpg\"]")
     private List<String> imageUrl;
+
+    @Schema(description = "ID of the tournament this gallery belongs to", example = "1")
+    private Integer tournament;
 }

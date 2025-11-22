@@ -24,7 +24,7 @@ public class RegistrationForm extends BaseEntity {
 
     @Size(max = 100)
     @NotNull
-    @Column(name = "full_name", length = 255, nullable = false)
+    @Column(name = "full_name", length = 100, nullable = false)
     private String fullName;
 
     @Email
