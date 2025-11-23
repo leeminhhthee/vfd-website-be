@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,8 +130,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
 
         if (updateDto.getEmail() != null) {
-            List<User> found = userRepository.findByEmail(updateDto.getEmail());
-            if (!found.isEmpty() && !found.get(0).getId().equals(id)) {
+            Optional<User> found = userRepository.findByEmail(updateDto.getEmail());
+            if (found.isPresent() && !found.get().getId().equals(id)) {
                 throw new EntityDuplicateException("User");
             }
             user.setEmail(updateDto.getEmail());

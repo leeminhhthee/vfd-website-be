@@ -1,22 +1,33 @@
 package com.example.spring_vfdwebsite.services.auth;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginRequestDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginResponseDto;
+import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterInitRequestDto;
+import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterInitResponseDto;
+import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterResponseDto;
+import com.example.spring_vfdwebsite.dtos.otpDTOs.ConfirmRegistrationDto;
+import com.example.spring_vfdwebsite.dtos.otpDTOs.ResendOtpRequestDto;
+import com.example.spring_vfdwebsite.dtos.otpDTOs.ResendOtpResponseDto;
+import com.example.spring_vfdwebsite.entities.PendingUser;
 import com.example.spring_vfdwebsite.entities.RefreshToken;
 import com.example.spring_vfdwebsite.entities.User;
 import com.example.spring_vfdwebsite.exceptions.HttpException;
+import com.example.spring_vfdwebsite.repositories.PendingUserJpaRepository;
 import com.example.spring_vfdwebsite.repositories.RefreshTokenRepository;
 import com.example.spring_vfdwebsite.repositories.UserJpaRepository;
 import com.example.spring_vfdwebsite.services.JwtService;
+import com.example.spring_vfdwebsite.services.mailOtp.OtpService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +40,9 @@ public class AuthServiceImpl implements AuthService {
     private final UserJpaRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final PendingUserJpaRepository pendingUserRepository;
+    private final OtpService otpService;
 
     @Override
     public LoginResponseDto loginUser(LoginRequestDto requestDto) {
@@ -113,4 +127,105 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(newRefreshTokenStr)
                 .build();
     }
+
+    @Override
+    public RegisterInitResponseDto registerInit(RegisterInitRequestDto requestDto) {
+
+        if (userRepository.existsByEmail(requestDto.getEmail())) {
+            throw new HttpException("Email is already registered", HttpStatus.CONFLICT);
+        }
+
+        // Xóa pending user cũ nếu có
+        pendingUserRepository.deleteByEmail(requestDto.getEmail());
+
+        // Tạo pending user mới
+        PendingUser pendingUser = PendingUser.builder()
+                .email(requestDto.getEmail())
+                .fullName(requestDto.getFullName())
+                .phoneNumber(requestDto.getPhoneNumber())
+                .password(passwordEncoder.encode(requestDto.getPassword()))
+                .isAdmin(false)
+                .build();
+        pendingUserRepository.save(pendingUser);
+
+        // Gửi OTP đến email
+        otpService.sendOtp(requestDto.getEmail(), requestDto.getFullName());
+
+        return RegisterInitResponseDto.builder()
+                .email(requestDto.getEmail())
+                .message("OTP has been sent to your email. Please verify your email with the OTP sent.")
+                .build();
+    }
+
+    // Xác thực OTP và hoàn tất đăng ký
+    @Override
+    public RegisterResponseDto registerConfirm(ConfirmRegistrationDto requestDto) {
+        // Kiểm tra pending user
+        PendingUser pendingUser = pendingUserRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new HttpException("No registration initiated for this email", HttpStatus.NOT_FOUND));
+
+        // Xác thực OTP
+        if (!otpService.verifyOtp(requestDto.getEmail(), requestDto.getOtp())) {
+            throw new HttpException("Invalid or expired OTP", HttpStatus.BAD_REQUEST);
+        }
+
+        // Kiểm tra pending user chưa hết hạn
+        if (pendingUser.getExpiresAt().isBefore(LocalDateTime.now())) {
+            pendingUserRepository.deleteByEmail(requestDto.getEmail());
+            throw new HttpException("Registration session expired. Please register again.", HttpStatus.BAD_REQUEST);
+        }
+
+        // Kiểm tra email đã tồn tại
+        if (userRepository.existsByEmail(pendingUser.getEmail())) {
+            pendingUserRepository.deleteByEmail(requestDto.getEmail());
+            throw new HttpException("Email already exists", HttpStatus.CONFLICT);
+        }
+
+        // Tạo user mới
+        User user = User.builder()
+                .email(pendingUser.getEmail())
+                .fullName(pendingUser.getFullName())
+                .phoneNumber(pendingUser.getPhoneNumber())
+                .password(pendingUser.getPassword())
+                .isAdmin(false) // Mặc định không phải admin
+                .build();
+        userRepository.save(user);
+
+        // Xóa pending user
+        pendingUserRepository.delete(pendingUser);
+
+        String token = jwtService.generateAccessToken(user);
+
+        return RegisterResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .message("Registration completed successfully.")
+                .accessToken(token)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ResendOtpResponseDto resendOtp(ResendOtpRequestDto requestDto) {
+        // Kiểm tra pending user
+        PendingUser pendingUser = pendingUserRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new HttpException("No registration initiated for this email", HttpStatus.NOT_FOUND));
+
+        // Kiểm tra pending user chưa hết hạn
+        if (pendingUser.getExpiresAt().isBefore(LocalDateTime.now())) {
+            pendingUserRepository.deleteByEmail(requestDto.getEmail());
+            throw new HttpException("Registration session expired. Please register again.", HttpStatus.BAD_REQUEST);
+        }
+
+        // Gửi lại OTP đến email
+        otpService.sendOtp(requestDto.getEmail(), pendingUser.getFullName());
+
+        return ResendOtpResponseDto.builder()
+                .email(requestDto.getEmail())
+                .message("OTP has been resent to your email.")
+                .cooldownSeconds(otpService.getRemainingCooldownSeconds(requestDto.getEmail()))
+                .build();
+    }
+
 }

@@ -54,6 +54,14 @@ dependencies {
 
 	// Dotenv
 	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// Java Mail Sender
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'jakarta.mail:jakarta.mail-api:2.1.3'
+	implementation 'com.sun.mail:jakarta.mail:2.0.1'
 }
 
 tasks.named('test') {

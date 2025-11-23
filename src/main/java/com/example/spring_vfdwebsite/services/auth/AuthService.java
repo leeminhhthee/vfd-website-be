@@ -2,6 +2,12 @@ package com.example.spring_vfdwebsite.services.auth;
 
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginRequestDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginResponseDto;
+import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterInitRequestDto;
+import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterInitResponseDto;
+import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterResponseDto;
+import com.example.spring_vfdwebsite.dtos.otpDTOs.ConfirmRegistrationDto;
+import com.example.spring_vfdwebsite.dtos.otpDTOs.ResendOtpRequestDto;
+import com.example.spring_vfdwebsite.dtos.otpDTOs.ResendOtpResponseDto;
 
 public interface AuthService {
     
@@ -14,4 +20,10 @@ public interface AuthService {
     LoginResponseDto loginUser(LoginRequestDto requestDto);
 
     LoginResponseDto refreshToken(String refreshToken);
+
+    RegisterInitResponseDto registerInit(RegisterInitRequestDto requestDto);
+
+    RegisterResponseDto registerConfirm(ConfirmRegistrationDto requestDto);
+
+    ResendOtpResponseDto resendOtp(ResendOtpRequestDto requestDto);
 }
