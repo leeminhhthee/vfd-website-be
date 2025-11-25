@@ -52,4 +52,8 @@ public class RegistrationFormCreateRequestDto {
 
     @Schema(description = "Registration status (defaults to pending if not provided)", example = "pending", allowableValues = { "pending", "approved", "rejected" })
     private RegistrationStatusEnum status;
+
+    @Schema(description = "ID of the tournament to register for", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "tournamentId is required")
+    private Integer tournamentId;
 }

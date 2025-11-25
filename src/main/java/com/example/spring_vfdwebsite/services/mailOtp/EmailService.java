@@ -1,7 +1,5 @@
 package com.example.spring_vfdwebsite.services.mailOtp;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -102,8 +100,50 @@ public class EmailService {
         }
     }
 
+    // Respond email submit registration form tournament
+    public void sendRespondSubmitRegistrationFormEmail(String toEmail, String fullName, String teamName, String phoneNumber, String registrationUnit, Integer numberAthletes, String fileUrl, String tournamentName, String status) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, "Volleyball Federation Da Nang ");
+            helper.setTo(toEmail);
+            helper.setSubject("Phản hồi đăng ký tham gia giải đấu - Volleyball Federation Da Nang ");
+
+            String htmlContent = buildTournamentRegistrationEmail(fullName, teamName, toEmail, phoneNumber, registrationUnit, numberAthletes, fileUrl, tournamentName, status);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("Respond submit registration form email sent successfully to: {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send respond submit registration form email to: {}", toEmail, e);
+            throw new HttpException("Failed to send respond submit registration form email", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Registration approval response email
+    public void sendRegistrationApprovalResponseEmail(String toEmail, String fullName, String teamName, String registrationUnit, String tournamentName, String status, String adminNote) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, "Volleyball Federation Da Nang ");
+            helper.setTo(toEmail);
+            helper.setSubject("Phản hồi phê duyệt đăng ký - Volleyball Federation Da Nang ");
+
+            String htmlContent = buildTournamentApprovalEmail(fullName, teamName, registrationUnit, tournamentName, status, adminNote);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("Registration approval response email sent successfully to: {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send registration approval response email to: {}", toEmail, e);
+            throw new HttpException("Failed to send registration approval response email", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private String buildOtpEmailTemplate(String otp, String fullName, String purpose) {
-        return """
+        String template = """
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -126,19 +166,13 @@ public class EmailService {
                             <h2>Xác thực tài khoản của bạn</h2>
                         </div>
 
-                        <p>Xin chào <strong>"""
-                + fullName + """
-                            </strong>,</p>
+                        <p>Xin chào <strong>%1$s</strong>,</p>
 
-                        <p>Cảm ơn bạn đã đăng ký tài khoản tại Volleyball Federation Da Nang . Để hoàn tất quá trình """
-                + purpose
-                + """
-                            , vui lòng nhập mã OTP bên dưới:</p>
+                        <p>Cảm ơn bạn đã đăng ký tài khoản tại Volleyball Federation Da Nang . Để hoàn tất quá trình %2$s, vui lòng nhập mã OTP bên dưới:</p>
 
                         <div class="otp-code">
                             <p style="margin: 0; color: #666;">Mã xác thực OTP của bạn là:</p>
-                            <div class="otp-number">""" + otp + """
-                            </div>
+                            <div class="otp-number">%3$s</div>
                         </div>
 
                         <div class="warning">
@@ -146,27 +180,25 @@ public class EmailService {
                             <ul style="margin: 10px 0; padding-left: 20px;">
                                 <li>Mã OTP này có hiệu lực trong <strong>5 phút</strong></li>
                                 <li>Không chia sẻ mã này với bất kỳ ai</li>
-                                <li>Nếu bạn không yêu cầu """ + purpose + """
-                                            , vui lòng bỏ qua email này</li>
-                                    </ul>
-                                </div>
+                                <li>Nếu bạn không yêu cầu %2$s, vui lòng bỏ qua email này</li>
+                            </ul>
+                        </div>
 
-                                <p>Nếu bạn gặp bất kỳ vấn đề gì, vui lòng liên hệ với chúng tôi qua email hỗ trợ.</p>
+                        <p>Nếu bạn gặp bất kỳ vấn đề gì, vui lòng liên hệ với chúng tôi qua email hỗ trợ.</p>
 
-                                <div class="footer">
-                                    <p>Trân trọng,<br>Volleyball Federation Da Nang  Team</p>
-                                    <p style="margin-top: 15px;">
-                                        <small>Email này được gửi tự động, vui lòng không trả lời.</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                        """;
+                        <div class="footer">
+                            <p>Trân trọng,<br>Volleyball Federation Da Nang</p>
+                            <p style="margin-top: 15px;"><small>Email này được gửi tự động, vui lòng không trả lời.</small></p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """;
+        return String.format(template, fullName, purpose, otp);
     }
 
     private String buildChangePasswordOtpTemplate(String otp, String fullName) {
-        return """
+        String template = """
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -189,47 +221,40 @@ public class EmailService {
                             <h2>Thay đổi mật khẩu</h2>
                         </div>
 
-                        <p>Xin chào <strong>"""
-                + fullName
-                + """
-                            </strong>,</p>
+                        <p>Xin chào <strong>%1$s</strong>,</p>
 
                         <p>Chúng tôi nhận được yêu cầu thay đổi mật khẩu cho tài khoản của bạn. Để xác nhận thay đổi, vui lòng nhập mã OTP bên dưới:</p>
 
                         <div class="otp-code">
                             <p style="margin: 0; color: #666;">Mã xác thực OTP của bạn là:</p>
-                            <div class="otp-number">"""
-                + otp
-                + """
-                                    </div>
-                                </div>
+                            <div class="otp-number">%2$s</div>
+                        </div>
 
-                                <div class="warning">
-                                    <strong>⚠️ Lưu ý bảo mật:</strong>
-                                    <ul style="margin: 10px 0; padding-left: 20px;">
-                                        <li>Mã OTP này có hiệu lực trong <strong>5 phút</strong></li>
-                                        <li>Tuyệt đối không chia sẻ mã này với bất kỳ ai</li>
-                                        <li>Nếu bạn không yêu cầu thay đổi mật khẩu, vui lòng bỏ qua email này và kiểm tra bảo mật tài khoản</li>
-                                        <li>Sau khi thay đổi mật khẩu thành công, bạn sẽ cần đăng nhập lại</li>
-                                    </ul>
-                                </div>
+                        <div class="warning">
+                            <strong>⚠️ Lưu ý bảo mật:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Mã OTP này có hiệu lực trong <strong>5 phút</strong></li>
+                                <li>Tuyệt đối không chia sẻ mã này với bất kỳ ai</li>
+                                <li>Nếu bạn không yêu cầu thay đổi mật khẩu, vui lòng bỏ qua email này và kiểm tra bảo mật tài khoản</li>
+                                <li>Sau khi thay đổi mật khẩu thành công, bạn sẽ cần đăng nhập lại</li>
+                            </ul>
+                        </div>
 
-                                <p>Nếu bạn gặp bất kỳ vấn đề gì, vui lòng liên hệ với chúng tôi ngay lập tức qua email hỗ trợ.</p>
+                        <p>Nếu bạn gặp bất kỳ vấn đề gì, vui lòng liên hệ với chúng tôi ngay lập tức qua email hỗ trợ.</p>
 
-                                <div class="footer">
-                                    <p>Trân trọng,<br>Volleyball Federation Da Nang  Team</p>
-                                    <p style="margin-top: 15px;">
-                                        <small>Email này được gửi tự động, vui lòng không trả lời.</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                        """;
+                        <div class="footer">
+                            <p>Trân trọng,<br>Volleyball Federation Da Nang</p>
+                            <p style="margin-top: 15px;"><small>Email này được gửi tự động, vui lòng không trả lời.</small></p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """;
+        return String.format(template, fullName, otp);
     }
 
     private String buildForgotPasswordOtpTemplate(String otp, String fullName) {
-        return """
+        String template = """
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -252,260 +277,209 @@ public class EmailService {
                             <h2>Khôi phục mật khẩu</h2>
                         </div>
 
-                        <p>Xin chào <strong>"""
-                + fullName
-                + """
-                            </strong>,</p>
+                        <p>Xin chào <strong>%1$s</strong>,</p>
 
                         <p>Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn. Để tiếp tục quá trình đặt lại mật khẩu, vui lòng nhập mã OTP bên dưới:</p>
 
                         <div class="otp-code">
                             <p style="margin: 0; color: #666;">Mã xác thực OTP của bạn là:</p>
-                            <div class="otp-number">"""
-                + otp
-                + """
-                                    </div>
-                                </div>
+                            <div class="otp-number">%2$s</div>
+                        </div>
 
-                                <div class="warning">
-                                    <strong>🔒 Hướng dẫn khôi phục:</strong>
-                                    <ul style="margin: 10px 0; padding-left: 20px;">
-                                        <li>Mã OTP này có hiệu lực trong <strong>5 phút</strong></li>
-                                        <li>Sau khi xác thực OTP, bạn sẽ được yêu cầu nhập mật khẩu mới</li>
-                                        <li>Tuyệt đối không chia sẻ mã này với bất kỳ ai</li>
-                                        <li>Nếu bạn không yêu cầu khôi phục mật khẩu, vui lòng bỏ qua email này và kiểm tra bảo mật tài khoản</li>
-                                    </ul>
-                                </div>
+                        <div class="warning">
+                            <strong>🔒 Hướng dẫn khôi phục:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Mã OTP này có hiệu lực trong <strong>5 phút</strong></li>
+                                <li>Sau khi xác thực OTP, bạn sẽ được yêu cầu nhập mật khẩu mới</li>
+                                <li>Tuyệt đối không chia sẻ mã này với bất kỳ ai</li>
+                                <li>Nếu bạn không yêu cầu khôi phục mật khẩu, vui lòng bỏ qua email này và kiểm tra bảo mật tài khoản</li>
+                            </ul>
+                        </div>
 
-                                <p><strong>Lưu ý:</strong> Sau khi đặt lại mật khẩu thành công, tất cả các phiên đăng nhập hiện tại sẽ bị hủy và bạn cần đăng nhập lại.</p>
+                        <p><strong>Lưu ý:</strong> Sau khi đặt lại mật khẩu thành công, tất cả các phiên đăng nhập hiện tại sẽ bị hủy và bạn cần đăng nhập lại.</p>
 
-                                <p>Nếu bạn gặp bất kỳ vấn đề gì, vui lòng liên hệ với chúng tôi ngay lập tức qua email hỗ trợ.</p>
+                        <p>Nếu bạn gặp bất kỳ vấn đề gì, vui lòng liên hệ với chúng tôi ngay lập tức qua email hỗ trợ.</p>
 
-                                <div class="footer">
-                                    <p>Trân trọng,<br>Volleyball Federation Da Nang  Team</p>
-                                    <p style="margin-top: 15px;">
-                                        <small>Email này được gửi tự động, vui lòng không trả lời.</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                        """;
+                        <div class="footer">
+                            <p>Trân trọng,<br>Volleyball Federation Da Nang</p>
+                            <p style="margin-top: 15px;"><small>Email này được gửi tự động, vui lòng không trả lời.</small></p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """;
+        return String.format(template, fullName, otp);
     }
 
-    public String buildAssignmentDueReportTemplate(String teacherName, String className,
-            List<String> studentNamesSubmitted) {
-        String summary;
-        if (studentNamesSubmitted == null || studentNamesSubmitted.isEmpty()) {
-            return null; // Không gửi nếu không có ai nộp
-        } else if (studentNamesSubmitted.size() <= 3) {
-            summary = String.join(", ", studentNamesSubmitted) + " đã nộp bài.";
-        } else {
-            List<String> firstThree = studentNamesSubmitted.subList(0, 3);
-            summary = String.join(", ", firstThree) + " và " + (studentNamesSubmitted.size() - 3)
-                    + " học sinh khác đã nộp bài.";
-        }
+    // Respond email submit registration form tournament
+    public String buildTournamentRegistrationEmail(
+            String fullName,
+            String teamName,
+            String email,
+            String phoneNumber,
+            String registrationUnit,
+            Integer numberAthletes,
+            String fileUrl,
+            String tournamentName,
+            String status) {
 
-        return """
+        String statusColor;
+        String statusLabel;
+
+        switch (status.toLowerCase()) {
+            case "accepted":
+                statusColor = "#28a745";
+                statusLabel = "Đã được chấp nhận";
+                break;
+            case "rejected":
+                statusColor = "#dc3545";
+                statusLabel = "Bị từ chối";
+                break;
+            default:
+                statusColor = "#007bff";
+                statusLabel = "Đang chờ phê duyệt";
+        }
+        String template = """
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <meta charset="UTF-8">
-                    <title>Báo cáo bài tập đến hạn hôm nay</title>
+                    <title>Xác nhận đăng ký giải đấu</title>
                     <style>
                         body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
-                        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px;
+                                     border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
                         .header { text-align: center; margin-bottom: 20px; color: #007bff; }
+                        .label { font-weight: bold; color: #333; }
+                        .value { color: #000; }
                         .highlight { color: #28a745; font-weight: bold; }
-                        .footer { margin-top: 30px; color: #555; font-size: 14px; }
+                        .footer { margin-top: 30px; color: #555; font-size: 14px; text-align: center; }
+                        .file-link { margin-top: 10px; }
                     </style>
                 </head>
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h2>Báo cáo bài tập đến hạn hôm nay</h2>
+                            <h2>Xác nhận đăng ký giải đấu</h2>
                         </div>
-                        <p>Xin chào <strong>"""
-                + teacherName + """
-                         </strong>,</p>
-                        <p>Danh sách học sinh lớp <strong>"""
-                + className + """
-                         </strong> đã nộp bài:</p>
-                        <p class="highlight">"""
-                + summary + """
-                                 </p>
-                                <p class="footer">Trân trọng,<br>Volleyball Federation Da Nang  Team</p>
-                            </div>
-                        </body>
-                        </html>
-                        """;
+                        <p>Xin chào <strong>%1$s</strong></p>
+                        <p>Chúng tôi đã nhận được đăng ký tham gia giải:</p>
+
+                        <p class="highlight">%8$s</p>
+
+                        <p>Dưới đây là thông tin đăng ký của bạn:</p>
+
+                        <p><span class="label">Tên đội:</span> <span class="value">%2$s</span></p>
+                        <p><span class="label">Email liên hệ:</span> <span class="value">%3$s</span></p>
+                        <p><span class="label">Số điện thoại:</span> <span class="value">%4$s</span></p>
+                        <p><span class="label">Đơn vị đăng ký:</span> <span class="value">%5$s</span></p>
+                        <p><span class="label">Số lượng vận động viên:</span> <span class="value">%6$s</span></p>
+                        <p><span class="label">Tình trạng đơn:</span>
+                            <span class="value" style="color:%10$s; font-weight:bold">%9$s</span>
+                        </p>
+
+                        <p class="file-link">
+                            <span class="label">File thông tin đội:</span>
+                            <a href='%7$s' target="_blank">Xem tại đây</a>
+                        </p>
+
+                        <p>Chúng tôi sẽ xem xét và phản hồi kết quả phê duyệt sớm nhất có thể.</p>
+
+                        <p class="footer">Trân trọng,<br>Volleyball Federation Da Nang</p>
+                    </div>
+                </body>
+                </html>
+                """;
+        return String.format(template, fullName, teamName, email, phoneNumber, registrationUnit,
+                String.valueOf(numberAthletes), fileUrl, tournamentName, statusLabel, statusColor);
     }
 
-    public String buildClassChangeTemplate(String fullName, String className, String type, String date, String note) {
-        String action = type.equalsIgnoreCase("cancel") ? " nghỉ học " : " học bù ";
-        return """
+    // Registration approval response email
+    public String buildTournamentApprovalEmail(
+            String fullName,
+            String teamName,
+            String registrationUnit,
+            String tournamentName,
+            String status,
+            String adminNote // ghi chú từ admin (tùy chọn)
+    ) {
+
+        String statusColor;
+        String statusLabel;
+        String statusMessage;
+
+        switch (status.toLowerCase()) {
+            case "accepted":
+                statusColor = "#28a745";
+                statusLabel = "Đã được phê duyệt";
+                statusMessage = "Chúc mừng! Đơn đăng ký của bạn đã được phê duyệt. Vui lòng chuẩn bị đội hình tham gia giải theo đúng lịch trình.";
+                break;
+
+            case "rejected":
+                statusColor = "#dc3545";
+                statusLabel = "Bị từ chối";
+                statusMessage = "Rất tiếc! Đơn đăng ký của bạn chưa được chấp nhận. Bạn có thể xem ghi chú để biết thêm chi tiết.";
+                break;
+
+            default:
+                statusColor = "#007bff";
+                statusLabel = "Không xác định";
+                statusMessage = "";
+        }
+
+        if (adminNote == null || adminNote.trim().isEmpty()) {
+            adminNote = "Không có ghi chú.";
+        }
+
+        String template = """
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <meta charset="UTF-8">
-                    <title>Thông báo """
-                + action
-                + """
-                            </title>
-                            <style>
-                                body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
-                                .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px;
-                                             border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                                .header { text-align: center; margin-bottom: 20px; color: #007bff; }
-                                .highlight { color: #dc3545; font-weight: bold; }
-                                .note { background-color: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; margin: 15px 0; }
-                                .footer { margin-top: 30px; color: #555; font-size: 14px; }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="container">
-                                <div class="header">
-                                <h2>Thông báo"""
-                + action + """
-                             </h2>
+                    <title>Kết quả phê duyệt đăng ký giải đấu</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+                        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px;
+                                     border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                        .header { text-align: center; margin-bottom: 20px; color: #007bff; }
+                        .label { font-weight: bold; color: #333; }
+                        .value { color: #000; }
+                        .footer { margin-top: 30px; color: #555; font-size: 14px; text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h2>Kết quả phê duyệt đăng ký</h2>
                         </div>
-                               <p>Xin chào<strong>
-                        """ + fullName + """
-                         </strong>,</p>
-                               <p>Lớp<strong>
-                        """ + className + """
-                               </strong>sẽ<span class="highlight">
-                        """ + action + """
-                          </span>
-                               vào ngày<strong>
-                        """ + date + """
-                        </strong>.</p>
-                        """ + (note != null && !note.isEmpty() ? "<p class='note'>Ghi chú: " + note + "</p>" : "") + """
-                                <p class="footer">Trân trọng,<br>Volleyball Federation Da Nang  Team</p>
-                            </div>
-                        </body>
-                        </html>
-                        """;
+
+                        <p>Xin chào <strong>%1$s</strong>,</p>
+
+                        <p>Đơn đăng ký tham gia giải đấu <strong>%4$s</strong> của đội <strong>%2$s</strong> thuộc đơn vị <strong>%3$s</strong> đã có kết quả.</p>
+
+                        <p><span class="label">Trạng thái:</span>
+                            <span class="value" style="color:%6$s; font-weight:bold">%5$s</span>
+                        </p>
+
+                        <p>%7$s</p>
+                        <p><span class="label">Ghi chú từ ban tổ chức:</span></p>
+                        <p>%8$s</p>
+
+                        <p class="footer">Trân trọng,<br>Volleyball Federation Da Nang</p>
+                    </div>
+                </body>
+                </html>
+                """;
+
+        return String.format(
+                template,
+                fullName,
+                teamName,
+                registrationUnit,
+                tournamentName,
+                statusLabel,
+                statusColor,
+                statusMessage,
+                adminNote);
     }
-
-    // public void sendAssignmentGradedEmail(String toEmail, String studentName, String assignmentTitle, String grade,
-    //         String teacherName) {
-    //     try {
-    //         MimeMessage message = mailSender.createMimeMessage();
-    //         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-    //         helper.setFrom(fromEmail, "Volleyball Federation Da Nang ");
-    //         helper.setTo(toEmail);
-    //         helper.setSubject("Bài tập đã được chấm - Volleyball Federation Da Nang ");
-
-    //         String htmlContent = buildAssignmentGradedTemplate(studentName, assignmentTitle, grade, teacherName);
-    //         helper.setText(htmlContent, true);
-
-    //         mailSender.send(message);
-    //         log.info("Assignment graded email sent successfully to student: {}", toEmail);
-    //     } catch (Exception e) {
-    //         log.error("Failed to send assignment graded email to student: {}", toEmail, e);
-    //         throw new HttpException("Failed to send assignment graded email", HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
-
-    // private String buildAssignmentGradedTemplate(String studentName, String assignmentTitle, String grade,
-    //         String teacherName) {
-    //     return """
-    //             <!DOCTYPE html>
-    //             <html>
-    //             <head>
-    //                 <meta charset="UTF-8">
-    //                 <title>Bài tập đã được chấm</title>
-    //                 <style>
-    //                     body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
-    //                     .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    //                     .header { text-align: center; margin-bottom: 30px; }
-    //                     .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 14px; }
-    //                 </style>
-    //             </head>
-    //             <body>
-    //                 <div class="container">
-    //                     <div class="header">
-    //                         <h1 style="color: #007bff;">Volleyball Federation Da Nang </h1>
-    //                         <h2>Kết quả bài tập</h2>
-    //                     </div>
-
-    //                     <p>Xin chào <strong>"""
-    //             + studentName + """
-    //                         </strong>,</p>
-
-    //                     <p>Thầy/cô <strong>""" + teacherName + """
-    //                     </strong> đã chấm điểm bài tập <strong>""" + assignmentTitle + """
-    //                         </strong> của bạn.</p>
-
-    //                     <p><strong>Điểm số của bạn là: </strong> """ + grade + """
-    //                             </p>
-
-    //                             <p>Vui lòng đăng nhập vào hệ thống để xem chi tiết kết quả.</p>
-
-    //                             <div class="footer">
-    //                                 <p>Trân trọng,<br>Volleyball Federation Da Nang  Team</p>
-    //                             </div>
-    //                         </div>
-    //                     </body>
-    //                     </html>
-    //                     """;
-    // }
-
-    // public void sendSlackWorkspaceInviteEmail(String toEmail, String fullName, String inviteLink) {
-    //     try {
-    //         MimeMessage message = mailSender.createMimeMessage();
-    //         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-    //         helper.setFrom(fromEmail, "Volleyball Federation Da Nang ");
-    //         helper.setTo(toEmail);
-    //         helper.setSubject("Tham gia Slack Workspace - Volleyball Federation Da Nang ");
-
-    //         String htmlContent = buildSlackInviteTemplate(fullName, inviteLink);
-    //         helper.setText(htmlContent, true);
-
-    //         mailSender.send(message);
-    //         log.info("Slack workspace invite email sent successfully to: {}", toEmail);
-    //     } catch (Exception e) {
-    //         log.error("Failed to send Slack workspace invite email to: {}", toEmail, e);
-    //         throw new HttpException("Failed to send Slack invite email", HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
-
-    // private String buildSlackInviteTemplate(String fullName, String inviteLink) {
-    //     return String.format(
-    //             """
-    //                     <!DOCTYPE html>
-    //                     <html>
-    //                     <head>
-    //                         <meta charset="UTF-8">
-    //                         <title>Tham gia Slack Workspace</title>
-    //                         <style>
-    //                             body { font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px; }
-    //                             .container { max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 10px;
-    //                                          box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    //                             h1 { color: #4A154B; text-align: center; }
-    //                             a.join-btn { display: inline-block; padding: 12px 24px; background-color: #4A154B; color: white;
-    //                                          text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; }
-    //                             p { color: #333; }
-    //                         </style>
-    //                     </head>
-    //                     <body>
-    //                         <div class="container">
-    //                             <h1>Chào mừng %s!</h1>
-    //                             <p>Bạn đã đăng ký tài khoản thành công trên <strong>Volleyball Federation Da Nang </strong>.</p>
-    //                             <p>Để nhận thông báo từ lớp học, vui lòng tham gia Slack Workspace của hệ thống:</p>
-    //                             <p style="text-align:center;">
-    //                                 <a class="join-btn" href="%s">Tham gia ngay</a>
-    //                             </p>
-    //                             <p>Nếu nút trên không hoạt động, bạn có thể copy link này vào trình duyệt:<br>
-    //                                 <a href="%s">%s</a></p>
-    //                             <p style="margin-top:30px;font-size:14px;color:#666;">Email này được gửi tự động, vui lòng không trả lời.</p>
-    //                         </div>
-    //                     </body>
-    //                     </html>
-    //                     """,
-    //             fullName, inviteLink, inviteLink, inviteLink);
-    // }
 }

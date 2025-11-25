@@ -1,5 +1,8 @@
 package com.example.spring_vfdwebsite.entities;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.spring_vfdwebsite.entities.enums.RegistrationStatusEnum;
 
 import jakarta.persistence.*;
@@ -16,7 +19,7 @@ import lombok.*;
 @Builder
 @Table(name = "registration_forms", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class RegistrationForm extends BaseEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -29,7 +32,7 @@ public class RegistrationForm extends BaseEntity {
 
     @Email
     @NotNull
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "phone_number")
@@ -57,4 +60,13 @@ public class RegistrationForm extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private RegistrationStatusEnum status;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "tournament_id", nullable = false)
+    private Tournament tournament;
+
+    @Column(name = "admin_note", length = 500)
+    private String adminNote;
 }

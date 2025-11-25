@@ -41,9 +41,25 @@ public class RegistrationFormResponseDto {
     @Schema(description = "Registration status", example = "pending", allowableValues = { "pending", "approved", "rejected" })
     private RegistrationStatusEnum status;
 
+    @Schema(description = "Tournament associated with the registration form")
+    private TournamentDto tournament;
+
     @Schema(description = "Timestamp when the project record was created", example = "2025-01-10T10:15:30")
     private LocalDateTime createdAt;
 
     @Schema(description = "Timestamp when the project record was last updated", example = "2025-01-15T12:20:45")
     private LocalDateTime updatedAt;
+
+    @Schema(description = "Administrative note", example = "Approved with conditions")
+    private String adminNote;
+
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TournamentDto {
+        private Integer id;
+        private String name;
+    }
 }
