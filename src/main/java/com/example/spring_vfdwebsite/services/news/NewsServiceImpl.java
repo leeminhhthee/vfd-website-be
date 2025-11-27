@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.spring_vfdwebsite.dtos.newsDTOs.NewsCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.newsDTOs.NewsResponseDto;
 import com.example.spring_vfdwebsite.dtos.newsDTOs.NewsUpdateRequestDto;
+import com.example.spring_vfdwebsite.dtos.searchDTOs.NewsIndexDto;
 import com.example.spring_vfdwebsite.entities.News;
 import com.example.spring_vfdwebsite.entities.User;
 import com.example.spring_vfdwebsite.events.news.NewsCreatedEvent;
@@ -35,6 +36,8 @@ public class NewsServiceImpl implements NewsService {
     private final UserJpaRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final CloudinaryUtils cloudinaryUtils;
+    private final SearchService searchService;
+    private final TitleSummarizationService titleSummarizationService;
 
     // ===================== Get all =====================
     @Override
@@ -79,6 +82,27 @@ public class NewsServiceImpl implements NewsService {
                 .authorBy(currentUser)
                 .build();
         News savedNews = newsRepository.save(news);
+
+        // Gọi AI để lấy tags (nếu có)
+        List<String> generatedTags = titleSummarizationService.generateTags(savedNews.getContent());
+
+        if (!generatedTags.isEmpty()) {
+            String tagsForSql = String.join(", ", generatedTags);
+            savedNews.setTags(tagsForSql);
+        }
+
+        NewsIndexDto indexDto = NewsIndexDto.builder()
+                .id(savedNews.getId().toString())
+                .title(savedNews.getTitle())
+                .type(savedNews.getType())
+                // Chỉ lấy 200 ký tự đầu của content để index cho nhẹ
+                .content(savedNews.getContent().substring(0, Math.min(savedNews.getContent().length(), 200)))
+                .imageUrl(savedNews.getImageUrl())
+                .aiTags(generatedTags)
+                .createdAt(savedNews.getCreatedAt())
+                .build();
+
+        searchService.addNewsToIndex(indexDto);
 
         // Publish event
         eventPublisher.publishEvent(new NewsCreatedEvent(savedNews.getId(), savedNews));
@@ -147,6 +171,7 @@ public class NewsServiceImpl implements NewsService {
                 .content(news.getContent())
                 .imageUrl(news.getImageUrl())
                 .status(news.getStatus())
+                .tags(news.getTags())
                 .authorBy(authorByDto)
                 .createdAt(news.getCreatedAt())
                 .updatedAt(news.getUpdatedAt())

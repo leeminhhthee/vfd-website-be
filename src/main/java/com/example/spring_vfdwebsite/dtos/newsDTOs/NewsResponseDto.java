@@ -22,7 +22,7 @@ public class NewsResponseDto {
     @Schema(description = "News title", example = "Giải bóng chuyền thành phố Đà Nẵng 2025")
     private String title;
 
-    @Schema(description = "News type", example = "city", allowableValues = { "city", "international", "insite_vn", "other" })
+    @Schema(description = "News type", example = "city", allowableValues = { "city", "international", "inside_vn", "other" })
     private NewsTypeEnum type;
 
     @Schema(description = "News content (HTML)", example = "<p>Nội dung tin tức...</p>")
@@ -36,6 +36,9 @@ public class NewsResponseDto {
 
     @Schema(description = "Information about the author of the news")
     private AuthorByDto authorBy;
+
+    @Schema(description = "Tags associated with the news", example = "sports, volleyball, city event")
+    private String tags;
 
     @Schema(description = "Timestamp when the project record was created", example = "2025-01-10T10:15:30")
     private LocalDateTime createdAt;

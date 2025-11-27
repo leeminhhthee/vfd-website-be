@@ -65,6 +65,9 @@ dependencies {
 
 	// Google API Client
 	implementation 'com.google.api-client:google-api-client:1.32.1'
+
+	// MeiliSearch Java SDK
+	implementation 'com.meilisearch.sdk:meilisearch-java:0.15.0'
 }
 
 tasks.named('test') {

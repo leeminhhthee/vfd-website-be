@@ -22,7 +22,7 @@ public class NewsUpdateRequestDto {
     @Schema(description = "News title", example = "Giải bóng chuyền Thành phố 2025")
     private String title;
 
-    @Schema(description = "News type", example = "city", allowableValues = { "city", "international", "insite_vn", "other" })
+    @Schema(description = "News type", example = "city", allowableValues = { "city", "international", "inside_vn", "other" })
     private NewsTypeEnum type;
 
     @Schema(description = "News content (HTML)", example = "<p>Nội dung tin tức...</p>")
