@@ -22,7 +22,7 @@ public class NewsCreateRequestDto {
     private String title;
 
     @NotNull(message = "Type must not be null")
-    @Schema(description = "News type", example = "city", allowableValues = { "city", "international", "insite_vn", "other" })
+    @Schema(description = "News type", example = "city", allowableValues = { "city", "international", "inside_vn", "other" })
     private NewsTypeEnum type;
 
     @NotBlank(message = "Content must not be empty")

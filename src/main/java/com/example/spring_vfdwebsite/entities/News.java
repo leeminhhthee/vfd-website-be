@@ -53,4 +53,7 @@ public class News extends BaseEntity {
     @NotNull
     @Column(name = "image_url", length = 500)
     private String imageUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String tags;
 }

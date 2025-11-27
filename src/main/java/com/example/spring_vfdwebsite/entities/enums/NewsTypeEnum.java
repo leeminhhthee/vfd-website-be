@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NewsTypeEnum {
     CITY("city"),
-    INSITE_VN("insite_vn"),
+    INSIDE_VN("inside_vn"),
     INTERNATIONAL("international"),
     OTHER("other");
 
