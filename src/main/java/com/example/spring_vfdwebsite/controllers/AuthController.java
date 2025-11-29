@@ -44,6 +44,19 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.OK).body(response);
         }
 
+        // Refresh token
+        @Operation(summary = "Refresh JWT token", description = "Generate a new JWT access token using a valid refresh token.", responses = {
+                        @ApiResponse(responseCode = "200", description = "Token refreshed successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponseDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token", content = @Content),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+        })
+        @PostMapping("/refresh-token")
+        public ResponseEntity<LoginResponseDto> refreshToken(@RequestBody Map<String, String> request) {
+                String refreshToken = request.get("refreshToken");
+                LoginResponseDto response = authService.refreshToken(refreshToken);
+                return ResponseEntity.ok(response);
+        }
+
         // Logout
         @PostMapping("/logout")
         public ResponseEntity<?> logout(HttpServletRequest request) {

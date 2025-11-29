@@ -83,11 +83,13 @@ public class AuthServiceImpl implements AuthService {
 
         // Build response
         return LoginResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .fullName(user.getFullName())
-                .imageUrl(user.getImageUrl())
-                .isAdmin(user.isAdmin())
+                .user(LoginResponseDto.UserDto.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .fullName(user.getFullName())
+                        .imageUrl(user.getImageUrl())
+                        .isAdmin(user.isAdmin())
+                        .build())
                 .accessToken(accessToken)
                 .refreshToken(refreshTokenStr)
                 .build();
@@ -119,10 +121,13 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenRepository.save(newRefreshToken);
 
         return LoginResponseDto.builder()
-                .id(user.getId())
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .isAdmin(user.isAdmin())
+                .user(LoginResponseDto.UserDto.builder()
+                        .id(user.getId())
+                        .fullName(user.getFullName())
+                        .email(user.getEmail())
+                        .imageUrl(user.getImageUrl())
+                        .isAdmin(user.isAdmin())
+                        .build())
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshTokenStr)
                 .build();

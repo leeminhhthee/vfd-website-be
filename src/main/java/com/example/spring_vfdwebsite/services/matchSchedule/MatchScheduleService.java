@@ -16,4 +16,6 @@ public interface MatchScheduleService {
     List<MatchScheduleResponseDto> getAllMatchSchedules();
 
     void deleteMatchSchedule(Integer id);
+
+    List<MatchScheduleResponseDto> getMatchSchedulesByTournament(Integer tournamentId);
 }

@@ -92,7 +92,7 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
         matchSchedule = matchScheduleRepository.save(matchSchedule);
 
         eventPublisher.publishEvent(new MatchScheduleUpdatedEvent(matchSchedule.getId(), matchSchedule));
-        
+
         return toDto(matchSchedule);
     }
 
@@ -127,6 +127,20 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
                 .orElseThrow(() -> new EntityNotFoundException("MatchSchedule with id " + id + " not found"));
         matchScheduleRepository.delete(matchSchedule);
         eventPublisher.publishEvent(new MatchScheduleDeletedEvent(id));
+    }
+
+    // ===================== Get By Tournament =====================
+    @Override
+    @Cacheable(value = "match-schedules", key = "'tournament_' + #root.args[0]")
+    @Transactional(readOnly = true)
+    public List<MatchScheduleResponseDto> getMatchSchedulesByTournament(Integer tournamentId) {
+        tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Tournament with id " + tournamentId + " not found"));
+        return matchScheduleRepository.findByTournament_Id(tournamentId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     // ===================== Mapping -> Dto =====================
