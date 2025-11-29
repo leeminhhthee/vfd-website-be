@@ -68,6 +68,9 @@ dependencies {
 
 	// MeiliSearch Java SDK
 	implementation 'com.meilisearch.sdk:meilisearch-java:0.15.0'
+
+	// WebClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {
