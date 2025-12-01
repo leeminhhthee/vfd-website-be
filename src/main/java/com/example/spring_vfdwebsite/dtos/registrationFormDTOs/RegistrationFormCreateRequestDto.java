@@ -1,5 +1,7 @@
 package com.example.spring_vfdwebsite.dtos.registrationFormDTOs;
 
+import java.time.LocalDate;
+
 import com.example.spring_vfdwebsite.entities.enums.RegistrationStatusEnum;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,10 +42,19 @@ public class RegistrationFormCreateRequestDto {
     @Size(max = 255, message = "registrationUnit must be less than 255 characters")
     private String registrationUnit;
 
+    @Schema(description = "Coach's name", example = "Trần Văn B", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "coach is required")
+    @Size(max = 100, message = "coach must be less than 100 characters")
+    private String coach;
+
     @Schema(description = "Number of athletes", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "numberAthletes is required")
     @Min(value = 1, message = "numberAthletes must be at least 1")
     private Integer numberAthletes;
+
+    @Schema(description = "Registration date", example = "2024-06-01", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "registrationDate is required")
+    private LocalDate registrationDate;
 
     @Schema(description = "File URL (Cloudinary URL)", example = "https://res.cloudinary.com/.../file.pdf", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "fileUrl is required")

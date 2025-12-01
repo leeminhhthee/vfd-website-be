@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.documentDTOs.DocumentCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.documentDTOs.DocumentResponseDto;
 import com.example.spring_vfdwebsite.dtos.documentDTOs.DocumentUpdateRequestDto;
@@ -62,6 +63,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     @CacheEvict(value = "documents", allEntries = true)
+    @LoggableAction(value =  "CREATE", entity = "documents", description = "Create document")
     public DocumentResponseDto createDocument(DocumentCreateRequestDto dto) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -112,6 +114,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Transactional
     @CachePut(value = "documents", key = "#p0")
     @CacheEvict(value = "documents", key = "'all'")
+    @LoggableAction(value =  "UPDATE", entity = "documents", description = "Update document")
     public DocumentResponseDto updateDocument(Integer id, DocumentUpdateRequestDto dto) {
         Document document = documentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Document with id " + id + " not found"));
@@ -164,6 +167,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     @CacheEvict(value = "documents", key = "'all'")
+    @LoggableAction(value =  "DELETE", entity = "documents", description = "Delete document")
     public void deleteDocument(Integer id) {
         Document document = documentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Document with id " + id + " not found"));

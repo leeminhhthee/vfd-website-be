@@ -19,6 +19,8 @@ public interface AuthService {
      */
     LoginResponseDto loginUser(LoginRequestDto requestDto);
 
+    void logoutUser(String refreshToken);
+
     LoginResponseDto refreshToken(String refreshToken);
 
     RegisterInitResponseDto registerInit(RegisterInitRequestDto requestDto);

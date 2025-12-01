@@ -1,5 +1,6 @@
 package com.example.spring_vfdwebsite.dtos.registrationFormDTOs;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import com.example.spring_vfdwebsite.entities.enums.RegistrationStatusEnum;
 
@@ -32,8 +33,14 @@ public class RegistrationFormResponseDto {
     @Schema(description = "Unit registering the team", example = "Liên đoàn Bóng chuyền Đà Nẵng")
     private String registrationUnit;
 
+    @Schema(description = "Coach's name", example = "Trần Văn B")
+    private String coach;
+
     @Schema(description = "Number of athletes", example = "12")
     private Integer numberAthletes;
+
+    @Schema(description = "Registration date", example = "2024-06-01")
+    private LocalDate registrationDate;
 
     @Schema(description = "URL to uploaded file", example = "https://res.cloudinary.com/.../file.pdf")
     private String fileUrl;

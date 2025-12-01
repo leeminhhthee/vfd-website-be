@@ -8,9 +8,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
+import com.example.spring_vfdwebsite.dtos.activityLogDTOs.ActivityLogCreateRequestDto;
 import com.example.spring_vfdwebsite.entities.User;
 import com.example.spring_vfdwebsite.exceptions.HttpException;
 import com.example.spring_vfdwebsite.repositories.UserJpaRepository;
+import com.example.spring_vfdwebsite.services.activityLog.ActivityLogService;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -31,15 +34,26 @@ public class PasswordService {
 
     private final SecureRandom secureRandom = new SecureRandom();
 
+    private final ActivityLogService activityLogService;
+
     /**
      * Gửi OTP để thay đổi mật khẩu (user đã đăng nhập)
      */
+    @LoggableAction(value = "SEND_CHANGE_PASSWORD_OTP", entity = "users", description = "Send change password OTP")
     public void sendChangePasswordOtp(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new HttpException("User not found", HttpStatus.NOT_FOUND));
 
         otpRedisService.sendChangePasswordOtp(email, user.getFullName());
         log.info("Change password OTP requested for user: {}", email);
+
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("SEND_CHANGE_PASSWORD_OTP")
+                .targetTable("users")
+                .targetId(user.getId())
+                .description("Send change password OTP")
+                .build();
+        activityLogService.createActivityLogResponseDto(user, logDto);
     }
 
     /**
@@ -65,26 +79,45 @@ public class PasswordService {
         validatePasswordPolicy(newPassword);
 
         user.setPassword(passwordEncoder.encode(newPassword));
+
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("CHANGE_PASSWORD_WITH_OTP")
+                .targetTable("users")
+                .targetId(user.getId())
+                .description("User changed password with OTP")
+                .build();
+        activityLogService.createActivityLogResponseDto(user, logDto);
+
         userRepository.save(user);
 
-        // TODO: revoke refresh tokens của user nếu bạn lưu trong DB/Redis
         log.info("Password changed successfully for user: {}", email);
     }
 
     /**
      * Gửi OTP cho quên mật khẩu
      */
+    @LoggableAction(value = "SEND_FORGOT_PASSWORD_OTP", entity = "users", description = "Send forgot password OTP")
     public void sendForgotPasswordOtp(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new HttpException("User not found", HttpStatus.NOT_FOUND));
 
         otpRedisService.sendForgotPasswordOtp(email, user.getFullName());
         log.info("Forgot password OTP sent for user: {}", email);
+
+        // Ghi log DB
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("SEND_FORGOT_PASSWORD_OTP")
+                .targetTable("users")
+                .targetId(user.getId())
+                .description("Send forgot password OTP")
+                .build();
+        activityLogService.createActivityLogResponseDto(user, logDto);
     }
 
     /**
      * Xác thực OTP quên mật khẩu -> cấp resetToken tạm (TTL 10 phút)
      */
+    @LoggableAction(value = "PASSWORD_RESET_INIT", entity = "users", description = "Verify forgot password OTP and issue reset token")
     public String verifyForgotPasswordOtpIssueToken(String email, String otp) {
         // Tìm user (để tránh lộ thông tin, vẫn thống nhất 404 nếu không tồn tại)
         userRepository.findByEmail(email)
@@ -104,6 +137,16 @@ public class PasswordService {
         redisTemplate.opsForValue().set(key, email, RESET_TOKEN_TTL_MINUTES, TimeUnit.MINUTES);
 
         log.info("Issued reset token for email {} with TTL {} minutes", email, RESET_TOKEN_TTL_MINUTES);
+        
+        // Ghi log DB
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("PASSWORD_RESET_INIT")
+                .targetTable("users")
+                .targetId(null)
+                .description("Verify forgot password OTP and issue reset token")
+                .build();
+        activityLogService.createActivityLogResponseDto(null, logDto);
+
         return resetToken;
     }
 
@@ -111,6 +154,7 @@ public class PasswordService {
      * Reset mật khẩu với resetToken tạm
      */
     @Transactional
+    @LoggableAction(value = "PASSWORD_RESET_COMPLETE", entity = "users", description = "Reset password with reset token")
     public void resetPasswordWithToken(String resetToken, String newPassword, String confirmPassword) {
         if (resetToken == null || resetToken.isBlank()) {
             throw new HttpException("Reset token is required", HttpStatus.BAD_REQUEST);
@@ -137,8 +181,16 @@ public class PasswordService {
         // Xóa token sau khi dùng
         redisTemplate.delete(key);
 
-        // TODO: revoke refresh tokens
         log.info("Password reset successfully for user: {}", email);
+
+        // Ghi log DB
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("PASSWORD_RESET_COMPLETE")
+                .targetTable("users")
+                .targetId(user.getId())
+                .description("Reset password with reset token")
+                .build();
+        activityLogService.createActivityLogResponseDto(user, logDto);
     }
 
     /**

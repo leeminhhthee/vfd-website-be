@@ -1,6 +1,7 @@
 package com.example.spring_vfdwebsite.services.boardDirector;
 
 import com.example.spring_vfdwebsite.dtos.boardDirectorDTOs.BoardDirectorResponseDto;
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.boardDirectorDTOs.BoardDirectorCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.boardDirectorDTOs.BoardDirectorUpdateRequestDto;
 import com.example.spring_vfdwebsite.entities.BoardDirector;
@@ -44,6 +45,8 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
 
     // Create new board director
     @Override
+    @CacheEvict(value = "board-directors", key = "'all'")
+    @LoggableAction(value =  "CREATE", entity = "board_directors", description = "Create new board director")
     public BoardDirectorResponseDto createBoardDirector(BoardDirectorCreateRequestDto createDto) {
 
         // Check email uniqueness
@@ -88,6 +91,7 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
     @Override
     @CachePut(value = "board-directors", key = "#p0")
     @CacheEvict(value = "board-directors", key = "'all'")
+    @LoggableAction(value =  "UPDATE", entity = "board_directors", description = "Update board director")
     public BoardDirectorResponseDto updateBoardDirector(Integer id, BoardDirectorUpdateRequestDto updateDto) {
         BoardDirector director = boardDirectorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("BoardDirector with id " + id));
@@ -125,6 +129,7 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
     // Delete director
     @Override
     @CacheEvict(value = "board-directors", key = "#id")
+    @LoggableAction(value =  "DELETE", entity = "board_directors", description = "Delete board director")
     public void deleteBoardDirector(Integer id) {
         BoardDirector director = boardDirectorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("BoardDirector with id " + id));

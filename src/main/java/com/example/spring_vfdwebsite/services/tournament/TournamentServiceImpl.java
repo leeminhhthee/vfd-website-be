@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.tournamentDTOs.TournamentCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.tournamentDTOs.TournamentUpdateRequestDto;
 import com.example.spring_vfdwebsite.dtos.tournamentDTOs.TournamentResponseDto;
@@ -44,6 +45,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     @CacheEvict(value = "tournaments", allEntries = true)
+    @LoggableAction(value =  "CREATE", entity = "tournaments", description = "Create a new tournament")
     public TournamentResponseDto createTournament(TournamentCreateRequestDto dto) {
 
         // Lấy user hiện tại
@@ -95,6 +97,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Transactional
     @CachePut(value = "tournaments", key = "#p0")
     @CacheEvict(value = "tournaments", key = "'all'")
+    @LoggableAction(value =  "UPDATE", entity = "tournaments", description = "Update an existing tournament")
     public TournamentResponseDto updateTournament(Integer tournamentId, TournamentUpdateRequestDto dto) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
@@ -171,6 +174,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     @CacheEvict(value = "tournaments", key = "'all'")
+    @LoggableAction(value =  "DELETE", entity = "tournaments", description = "Delete an existing tournament")
     public void deleteTournament(Integer tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));

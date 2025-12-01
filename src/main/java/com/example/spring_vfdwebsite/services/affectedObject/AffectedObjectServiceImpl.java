@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.affectedObjectDTOs.AffectedObjectCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.affectedObjectDTOs.AffectedObjectResponseDto;
 import com.example.spring_vfdwebsite.dtos.affectedObjectDTOs.AffectedObjectUpdateRequestDto;
@@ -35,6 +36,7 @@ public class AffectedObjectServiceImpl implements AffectedObjectService {
     // Create
     @Override
     @CacheEvict(value = "affected-objects", key = "'all'")
+    @LoggableAction(value =  "CREATE", entity = "affected_objects", description = "Create a new affected object")
     public AffectedObjectResponseDto createAffectedObject(
             AffectedObjectCreateRequestDto affectedObjectCreateRequestDto) {
         AffectedObject obj = AffectedObject.builder()
@@ -54,6 +56,7 @@ public class AffectedObjectServiceImpl implements AffectedObjectService {
     @Override
     @CachePut(value = "affected-objects", key = "#p0")
     @CacheEvict(value = "affected-objects", key = "'all'")
+    @LoggableAction(value =  "UPDATE", entity = "affected_objects", description = "Update an existing affected object")
     public AffectedObjectResponseDto updateAffectedObject(Integer id, 
             AffectedObjectUpdateRequestDto affectedObjectUpdateRequestDto) {
         AffectedObject obj = affectedObjectRepository.findById(id)
@@ -77,6 +80,7 @@ public class AffectedObjectServiceImpl implements AffectedObjectService {
     // Delete
     @Override
     @CacheEvict(value = "affected-objects", allEntries = true)
+    @LoggableAction(value =  "DELETE", entity = "affected_objects", description = "Delete an existing affected object")
     public void deleteAffectedObject(Integer id) {
         AffectedObject obj = affectedObjectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("AffectedObject with id " + id + " not found"));

@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.projectDTOs.ProjectCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.projectDTOs.ProjectResponseDto;
 import com.example.spring_vfdwebsite.dtos.projectDTOs.ProjectUpdateRequestDto;
@@ -58,6 +59,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     @CacheEvict(value = "projects", allEntries = true)
+    @LoggableAction(value =  "CREATE", entity = "projects", description = "Create a new project")
     public ProjectResponseDto createProject(ProjectCreateRequestDto dto) {
 
         Project project = Project.builder()
@@ -81,6 +83,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @CachePut(value = "projects", key = "#p0")
     @CacheEvict(value = { "projects" }, allEntries = true)
+    @LoggableAction(value =  "UPDATE", entity = "projects", description = "Update an existing project")
     public ProjectResponseDto updateProject(Integer id, ProjectUpdateRequestDto dto) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Project with id " + id + " not found"));
@@ -111,6 +114,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     @CacheEvict(value = { "projects" }, allEntries = true)
+    @LoggableAction(value =  "DELETE", entity = "projects", description = "Delete an existing project")
     public void deleteProject(Integer id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Project with id " + id + " not found"));

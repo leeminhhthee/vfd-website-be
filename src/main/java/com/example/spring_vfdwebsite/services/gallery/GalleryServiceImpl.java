@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.galleryDTOs.GalleryCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.galleryDTOs.GalleryUpdateRequestDto;
 import com.example.spring_vfdwebsite.dtos.galleryDTOs.GalleryResponseDto;
@@ -61,6 +62,7 @@ public class GalleryServiceImpl implements GalleryService {
     @Override
     @Transactional
     @CacheEvict(value = "galleries", allEntries = true)
+    @LoggableAction(value =  "CREATE", entity = "galleries", description = "Create new gallery")
     public GalleryResponseDto createGallery(GalleryCreateRequestDto dto) {
 
         Tournament tournament = null;
@@ -90,6 +92,7 @@ public class GalleryServiceImpl implements GalleryService {
     @Transactional
     @CacheEvict(value = "galleries", allEntries = true)
     @CachePut(value = "galleries", key = "#p0")
+    @LoggableAction(value =  "UPDATE", entity = "galleries", description = "Update gallery")
     public GalleryResponseDto updateGallery(Integer id, GalleryUpdateRequestDto dto) {
         Gallery gallery = galleryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Gallery not found with id " + id));
@@ -127,6 +130,7 @@ public class GalleryServiceImpl implements GalleryService {
     @Override
     @Transactional
     @CacheEvict(value = "galleries", allEntries = true)
+    @LoggableAction(value =  "DELETE", entity = "galleries", description = "Delete gallery")
     public void deleteGallery(Integer id) {
         Gallery gallery = galleryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Gallery not found with id " + id));

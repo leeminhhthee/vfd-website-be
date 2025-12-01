@@ -1,5 +1,7 @@
 package com.example.spring_vfdwebsite.entities;
 
+import java.time.LocalDate;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -48,9 +50,18 @@ public class RegistrationForm extends BaseEntity {
     @Column(name = "registration_unit", length = 255, nullable = false)
     private String registrationUnit;
 
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "coach", length = 100, nullable = false)
+    private String coach;
+
     @NotNull
     @Column(name = "number_athletes", nullable = false)
     private Integer numberAthletes;
+
+    @NotNull
+    @Column(name = "registration_date", nullable = false)
+    private LocalDate registrationDate;
 
     @Size(max = 500)
     @NotNull

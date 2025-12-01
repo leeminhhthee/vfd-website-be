@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.matchScheduleDTOs.fillDataDTOs.ApproveDraftsRequestDto;
 import com.example.spring_vfdwebsite.dtos.matchScheduleDTOs.fillDataDTOs.MatchAiDto;
 import com.example.spring_vfdwebsite.dtos.matchScheduleDTOs.fillDataDTOs.MatchScheduleDraftResponseDto;
@@ -73,6 +74,7 @@ public class MatchScheduleDraftServiceImpl implements MatchScheduleDraftService 
     // ==================== Extract Matches =====================
     @Override
     @Transactional(readOnly = true)
+    @LoggableAction(value =  "EXTRACT_MATCHES", entity = "match-schedule-drafts", description = "Extract matches from image URL")
     public List<MatchAiDto> extractMatches(String imageUrl) {
         // return openRouterService.extractMatchesFromImageUrl(imageUrl);
         return geminiOcrService.extractScheduleFromImageUrl(imageUrl);
@@ -82,6 +84,7 @@ public class MatchScheduleDraftServiceImpl implements MatchScheduleDraftService 
     @Override
     @Transactional
     @CacheEvict(value = "match-schedule-drafts", allEntries = true) // Xóa cache để hiện data mới
+    @LoggableAction(value =  "SAVE_DRAFTS", entity = "match-schedule-drafts", description = "Save new match schedule drafts")
     public List<MatchScheduleDraftResponseDto> saveDrafts(SaveDraftsRequestDto dto) {
         // 1. Kiểm tra giải đấu có tồn tại không
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
@@ -129,6 +132,7 @@ public class MatchScheduleDraftServiceImpl implements MatchScheduleDraftService 
     @Override
     @Transactional
     @CacheEvict(value = "match-schedule-drafts", allEntries = true)
+    @LoggableAction(value =  "APPROVE_DRAFTS", entity = "match-schedule-drafts", description = "Approve match schedule drafts and create official matches")
     public void approveDrafts(ApproveDraftsRequestDto dto) {
         List<Integer> ids = dto.getId();
         if (ids == null || ids.isEmpty()) return;

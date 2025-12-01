@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.newsDTOs.NewsCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.newsDTOs.NewsResponseDto;
 import com.example.spring_vfdwebsite.dtos.newsDTOs.NewsUpdateRequestDto;
@@ -65,6 +66,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     @Transactional
     @CacheEvict(value = "news", allEntries = true)
+    @LoggableAction(value =  "CREATE", entity = "news", description = "Create a new news item")
     public NewsResponseDto createNews(NewsCreateRequestDto dto) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -115,6 +117,7 @@ public class NewsServiceImpl implements NewsService {
     @Transactional
     @CachePut(value = "news", key = "#p0")
     @CacheEvict(value = "news", allEntries = true)
+    @LoggableAction(value =  "UPDATE", entity = "news", description = "Update an existing news item")
     public NewsResponseDto updateNews(Integer id, NewsUpdateRequestDto dto) {
         News news = newsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("News with id " + id + " not found"));
@@ -145,6 +148,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     @Transactional
     @CacheEvict(value = "news", allEntries = true)
+    @LoggableAction(value =  "DELETE", entity = "news", description = "Delete an existing news item")
     public void deleteNews(Integer id) {
         News news = newsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("News with id " + id + " not found"));

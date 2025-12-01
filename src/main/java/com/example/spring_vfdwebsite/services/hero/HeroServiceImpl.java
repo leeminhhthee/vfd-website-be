@@ -4,6 +4,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.heroDTOs.HeroCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.heroDTOs.HeroResponseDto;
 import com.example.spring_vfdwebsite.dtos.heroDTOs.HeroUpdateRequestDto;
@@ -57,6 +58,7 @@ public class HeroServiceImpl implements HeroService {
     @Override
     @Transactional
     @CacheEvict(value = "heroes", key = "'all'")
+    @LoggableAction(value =  "CREATE", entity = "heroes", description = "Create new hero")
     public HeroResponseDto createHero(HeroCreateRequestDto dto) {
         Hero hero = Hero.builder()
                 .title(dto.getTitle())
@@ -80,6 +82,7 @@ public class HeroServiceImpl implements HeroService {
     @Transactional
     @CachePut(value = "heroes", key = "#p0")
     @CacheEvict(value = "heroes", key = "'all'")
+    @LoggableAction(value =  "UPDATE", entity = "heroes", description = "Update hero")
     public HeroResponseDto updateHero(Integer id, HeroUpdateRequestDto dto) {
         Hero hero = heroRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hero with id " + id + " not found"));
@@ -110,6 +113,7 @@ public class HeroServiceImpl implements HeroService {
     @Override
     @Transactional
     @CacheEvict(value = "heroes", allEntries = true)
+    @LoggableAction(value =  "DELETE", entity = "heroes", description = "Delete hero")
     public void deleteHero(Integer id) {
         Hero hero = heroRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hero with id " + id));

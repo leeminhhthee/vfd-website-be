@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
+import com.example.spring_vfdwebsite.dtos.activityLogDTOs.ActivityLogCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginRequestDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginResponseDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterInitRequestDto;
@@ -27,6 +29,7 @@ import com.example.spring_vfdwebsite.repositories.PendingUserJpaRepository;
 import com.example.spring_vfdwebsite.repositories.RefreshTokenRepository;
 import com.example.spring_vfdwebsite.repositories.UserJpaRepository;
 import com.example.spring_vfdwebsite.services.JwtService;
+import com.example.spring_vfdwebsite.services.activityLog.ActivityLogService;
 import com.example.spring_vfdwebsite.services.mailOtp.OtpService;
 
 import lombok.RequiredArgsConstructor;
@@ -43,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final PendingUserJpaRepository pendingUserRepository;
     private final OtpService otpService;
+    private final ActivityLogService activityLogService;
 
     @Override
     public LoginResponseDto loginUser(LoginRequestDto requestDto) {
@@ -80,6 +84,15 @@ public class AuthServiceImpl implements AuthService {
                 .expiryDate(new Timestamp(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000)) // 7 ngày
                 .build();
         refreshTokenRepository.save(refreshToken);
+
+        // ===== GHI LOG LOGIN =====
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("LOGIN")
+                .targetTable("users")
+                .targetId(user.getId())
+                .description("User login")
+                .build();
+        activityLogService.createActivityLogResponseDto(user, logDto);
 
         // Build response
         return LoginResponseDto.builder()
@@ -120,6 +133,15 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         refreshTokenRepository.save(newRefreshToken);
 
+        // ===== GHI LOG REFRESH TOKEN =====
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("REFRESH_TOKEN")
+                .targetTable("users")
+                .targetId(user.getId())
+                .description("User refreshed access token")
+                .build();
+        activityLogService.createActivityLogResponseDto(user, logDto);
+
         return LoginResponseDto.builder()
                 .user(LoginResponseDto.UserDto.builder()
                         .id(user.getId())
@@ -152,6 +174,15 @@ public class AuthServiceImpl implements AuthService {
                 .isAdmin(false)
                 .build();
         pendingUserRepository.save(pendingUser);
+
+        // ===== GHI LOG REGISTER INIT =====
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("REGISTER_INIT")
+                .targetTable("users")
+                .targetId(null) // Chưa có user ID vì chưa hoàn tất đăng ký
+                .description("User initiated registration")
+                .build();
+        activityLogService.createActivityLogResponseDto(null, logDto);
 
         // Gửi OTP đến email
         otpService.sendOtp(requestDto.getEmail(), requestDto.getFullName());
@@ -196,6 +227,15 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         userRepository.save(user);
 
+        // ===== GHI LOG REGISTER COMPLETE =====
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("REGISTER_COMPLETE")
+                .targetTable("users")
+                .targetId(user.getId())
+                .description("User completed registration")
+                .build();
+        activityLogService.createActivityLogResponseDto(user, logDto);
+
         // Xóa pending user
         pendingUserRepository.delete(pendingUser);
 
@@ -226,11 +266,41 @@ public class AuthServiceImpl implements AuthService {
         // Gửi lại OTP đến email
         otpService.sendOtp(requestDto.getEmail(), pendingUser.getFullName());
 
+        // ===== GHI LOG RESEND OTP =====
+        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                .actionType("RESEND_OTP")
+                .targetTable("users")
+                .targetId(null) // Chưa có user ID vì chưa hoàn tất đăng ký
+                .description("User requested to resend OTP")
+                .build();
+        activityLogService.createActivityLogResponseDto(null, logDto);
+
         return ResendOtpResponseDto.builder()
                 .email(requestDto.getEmail())
                 .message("OTP has been resent to your email.")
                 .cooldownSeconds(otpService.getRemainingCooldownSeconds(requestDto.getEmail()))
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void logoutUser(String refreshToken) {
+        refreshTokenRepository.findByToken(refreshToken).ifPresent(token -> {
+            User user = token.getUser(); // Lấy user liên quan đến refresh token
+
+            // Xóa refresh token khỏi DB
+            refreshTokenRepository.delete(token);
+
+            // ===== GHI LOG LOGOUT =====
+            ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+                    .actionType("LOGOUT")
+                    .targetTable("users")
+                    .targetId(user.getId())
+                    .description("User logged out")
+                    .build();
+            activityLogService.createActivityLogResponseDto(user, logDto);
+            // =========================
+        });
     }
 
 }

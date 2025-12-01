@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginRequestDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginResponseDto;
+import com.example.spring_vfdwebsite.dtos.authDTOs.LogoutRequestDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterInitRequestDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterInitResponseDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.RegisterResponseDto;
@@ -58,9 +59,21 @@ public class AuthController {
         }
 
         // Logout
+        @Operation(summary = "Logout user", description = "Invalidate the provided refresh token to logout the user.", responses = {
+                        @ApiResponse(responseCode = "200", description = "Logout successful", content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.example.spring_vfdwebsite.dtos.ApiResponse.class))),
+                        @ApiResponse(responseCode = "400", description = "Refresh token is missing or invalid"),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+        })
         @PostMapping("/logout")
-        public ResponseEntity<?> logout(HttpServletRequest request) {
-                return ResponseEntity.ok().body(Map.of("message", "Logout successful"));
+        public ResponseEntity<com.example.spring_vfdwebsite.dtos.ApiResponse<Void>> logout(
+                        @Valid @RequestBody LogoutRequestDto requestDto) {
+
+                authService.logoutUser(requestDto.getRefreshToken());
+
+                return ResponseEntity.ok(com.example.spring_vfdwebsite.dtos.ApiResponse.<Void>builder()
+                                .success(true)
+                                .message("Logout successful")
+                                .build());
         }
 
         // Bước 1: Khởi tạo đăng ký và gửi OTP

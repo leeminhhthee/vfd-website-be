@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.cache.annotation.*;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.partnerDTOs.PartnerCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.partnerDTOs.PartnerResponseDto;
 import com.example.spring_vfdwebsite.dtos.partnerDTOs.PartnerUpdateRequestDto;
@@ -47,6 +48,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     @CacheEvict(value = "partners", key = "'all'")
+    @LoggableAction(value =  "CREATE", entity = "partners", description = "Create a new partner")
     public PartnerResponseDto createPartner(PartnerCreateRequestDto createRequestDto) {
         Partner partner = Partner.builder()
                 .name(createRequestDto.getName())
@@ -65,6 +67,7 @@ public class PartnerServiceImpl implements PartnerService {
     // ===== Get all partners =====
     @Override
     @Cacheable(value = "partners", key = "'all'")
+    @Transactional(readOnly = true)
     public List<PartnerResponseDto> getAllPartners() {
         System.out.println("🔥 Fetching all partner from the database...");
         return partnerRepository.findAll().stream()
@@ -86,6 +89,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Transactional
     @CachePut(value = "partners", key = "#p0")
     @CacheEvict(value = "partners", key = "'all'")
+    @LoggableAction(value =  "UPDATE", entity = "partners", description = "Update an existing partner")
     public PartnerResponseDto updatePartner(Integer id,PartnerUpdateRequestDto updateRequestDto) {
         Partner partner = partnerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Partner with id " + id + " not found"));
@@ -110,6 +114,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     @CacheEvict(value = "partners", allEntries = true)
+    @LoggableAction(value =  "DELETE", entity = "partners", description = "Delete an existing partner")
     public void deletePartner(Integer id) {
         Partner partner = partnerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Partner with id " + id));

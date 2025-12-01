@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.registrationFormDTOs.*;
 import com.example.spring_vfdwebsite.entities.RegistrationForm;
 import com.example.spring_vfdwebsite.entities.Tournament;
@@ -66,6 +67,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
     @Override
     @Transactional
     @CacheEvict(value = "registration-forms", allEntries = true)
+    @LoggableAction(value =  "CREATE", entity = "registration-forms", description = "Create a new registration form")
     public RegistrationFormResponseDto createRegistrationForm(RegistrationFormCreateRequestDto dto) {
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -77,7 +79,9 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
                 .phoneNumber(dto.getPhoneNumber())
                 .teamName(dto.getTeamName())
                 .registrationUnit(dto.getRegistrationUnit())
+                .coach(dto.getCoach())
                 .numberAthletes(dto.getNumberAthletes())
+                .registrationDate(dto.getRegistrationDate())
                 .fileUrl(dto.getFileUrl())
                 .status(RegistrationStatusEnum.PENDING)
                 .tournament(tournament)
@@ -99,6 +103,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
     @Transactional
     @CachePut(value = "registration-forms", key = "#p0")
     @CacheEvict(value = "registration-forms", key = "'all'")
+    @LoggableAction(value =  "UPDATE", entity = "registration-forms", description = "Update an existing registration form")
     public RegistrationFormResponseDto updateRegistrationForm(Integer id, RegistrationFormUpdateRequestDto dto) {
         RegistrationForm form = registrationFormRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("RegistrationForm with id " + id + " not found"));
@@ -118,8 +123,14 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
         if (dto.getRegistrationUnit() != null) {
             form.setRegistrationUnit(dto.getRegistrationUnit());
         }
+        if (dto.getCoach() != null) {
+            form.setCoach(dto.getCoach());
+        }
         if (dto.getNumberAthletes() != null) {
             form.setNumberAthletes(dto.getNumberAthletes());
+        }
+        if (dto.getRegistrationDate() != null) {
+            form.setRegistrationDate(dto.getRegistrationDate());
         }
         if (dto.getFileUrl() != null) {
             if (form.getFileUrl() != null) {
@@ -142,6 +153,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
     @Override
     @Transactional
     @CacheEvict(value = "registration-forms", allEntries = true)
+    @LoggableAction(value =  "DELETE", entity = "registration-forms", description = "Delete an existing registration form")
     public void deleteRegistrationForm(Integer id) {
         RegistrationForm form = registrationFormRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Registration Form with id " + id + " not found"));
@@ -160,6 +172,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
     @Transactional
     @CacheEvict(value = "registration-forms", key = "'all'")
     @CachePut(value = "registration-forms", key = "#p0")
+    @LoggableAction(value =  "CHANGE_STATUS", entity = "registration-forms", description = "Change registration form status")
     public RegistrationFormResponseDto changeRegistrationFormStatus(Integer id, RegistrationFormRequestDto dto) {
         RegistrationForm form = registrationFormRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("RegistrationForm with id " + id + " not found"));
@@ -228,7 +241,9 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
                 .phoneNumber(form.getPhoneNumber())
                 .teamName(form.getTeamName())
                 .registrationUnit(form.getRegistrationUnit())
+                .coach(form.getCoach())
                 .numberAthletes(form.getNumberAthletes())
+                .registrationDate(form.getRegistrationDate())
                 .fileUrl(form.getFileUrl())
                 .status(form.getStatus())
                 .tournament(tournamentDto)

@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.matchScheduleDTOs.MatchScheduleCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.matchScheduleDTOs.MatchScheduleResponseDto;
 import com.example.spring_vfdwebsite.dtos.matchScheduleDTOs.MatchScheduleUpdateRequestDto;
@@ -35,6 +36,8 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
     // ===================== Create =====================
     @Override
     @Transactional
+    @CacheEvict(value = "match-schedules", key = "'all'")
+    @LoggableAction(value =  "CREATE", entity = "match-schedules", description = "Create a new match schedule")
     public MatchScheduleResponseDto createMatchSchedule(MatchScheduleCreateRequestDto dto) {
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -63,6 +66,7 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
     @Transactional
     @CachePut(value = "match-schedules", key = "#p0")
     @CacheEvict(value = "match-schedules", key = "'all'")
+    @LoggableAction(value =  "UPDATE", entity = "match-schedules", description = "Update an existing match schedule")
     public MatchScheduleResponseDto updateMatchSchedule(Integer id, MatchScheduleUpdateRequestDto dto) {
         MatchSchedule matchSchedule = matchScheduleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("MatchSchedule with id " + id + " not found"));
@@ -122,6 +126,7 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
     @Override
     @Transactional
     @CacheEvict(value = "match-schedules", key = "'all'")
+    @LoggableAction(value =  "DELETE", entity = "match-schedules", description = "Delete an existing match schedule")
     public void deleteMatchSchedule(Integer id) {
         MatchSchedule matchSchedule = matchScheduleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("MatchSchedule with id " + id + " not found"));

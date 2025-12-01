@@ -1,5 +1,6 @@
 package com.example.spring_vfdwebsite.services.user;
 
+import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.userDTOs.UserCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.userDTOs.UserResponseDto;
 import com.example.spring_vfdwebsite.dtos.userDTOs.UserUpdateRequestDto;
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService {
     // Create new user
     @Override
     @CacheEvict(value = "users", allEntries = true)
+    @LoggableAction(value =  "CREATE", entity = "users", description = "Create a new user")
     public UserResponseDto createUser(UserCreateRequestDto createDto) {
 
         // Check email uniqueness
@@ -125,6 +127,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @CachePut(value = "users", key = "#p0")
     @CacheEvict(value = "users", key = "'all'")
+    @LoggableAction(value =  "UPDATE", entity = "users", description = "Update an existing user")
     public UserResponseDto updateUser(Integer id, UserUpdateRequestDto updateDto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
@@ -165,6 +168,7 @@ public class UserServiceImpl implements UserService {
     // Delete user
     @Override
     @CacheEvict(value = "users", key = "#id")
+    @LoggableAction(value =  "DELETE", entity = "users", description = "Delete an existing user")
     public void deleteUser(Integer id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id));
