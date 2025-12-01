@@ -40,6 +40,9 @@ public class TournamentResponseDto {
     @Schema(description = "Whether registration is open for this tournament", example = "false")
     private Boolean registrationOpen;
 
+    @Schema(description = "Banner URL for the tournament", example = "https://res.cloudinary.com/.../banner.jpg")
+    private String bannerUrl;
+
     @Schema(description = "Schedule images for the tournament")
     private List<String> scheduleImages;
 

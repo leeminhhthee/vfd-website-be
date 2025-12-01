@@ -41,6 +41,10 @@ public class TournamentUpdateRequestDto {
     @Schema(description = "Whether registration is open for this tournament", example = "false")
     private Boolean registrationOpen;
 
+    @Size(max = 500)
+    @Schema(description = "Banner URL for the tournament", example = "https://res.cloudinary.com/.../banner.jpg")
+    private String bannerUrl;
+
     @Schema(description = "List of URLs for schedule images")
     private List<String> scheduleImages;
 

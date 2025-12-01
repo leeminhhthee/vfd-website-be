@@ -55,6 +55,10 @@ public class Tournament extends BaseEntity {
     @Column(name = "registration_open")
     private Boolean registrationOpen;
 
+    @Size(max = 500)
+    @Column(name = "banner_url", length = 500)
+    private String bannerUrl;
+
     @ElementCollection
     @CollectionTable(name = "tournament_schedule_images", joinColumns = @JoinColumn(name = "tournament_id"))
     @Column(name = "image_url")
