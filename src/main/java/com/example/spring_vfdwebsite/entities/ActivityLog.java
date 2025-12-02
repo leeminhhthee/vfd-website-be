@@ -23,7 +23,6 @@ public class ActivityLog {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
     @Column(name = "action_type", nullable = false, length = 100)
     private String actionType;
 

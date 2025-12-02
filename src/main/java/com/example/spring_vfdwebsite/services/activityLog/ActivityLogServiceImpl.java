@@ -14,7 +14,6 @@ import com.example.spring_vfdwebsite.entities.ActivityLog;
 import com.example.spring_vfdwebsite.entities.User;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.ActivityLogJpaRepository;
-import com.example.spring_vfdwebsite.repositories.UserJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class ActivityLogServiceImpl implements ActivityLogService {
     private final ActivityLogJpaRepository activityLogRepository;
-    private final UserJpaRepository userRepository;
 
     // Lấy tất cả activity logs kèm thông tin user
     @Override

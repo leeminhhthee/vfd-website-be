@@ -11,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.activityLogDTOs.ActivityLogCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginRequestDto;
 import com.example.spring_vfdwebsite.dtos.authDTOs.LoginResponseDto;
