@@ -43,4 +43,7 @@ public class ProjectUpdateRequestDto {
     @Schema(description = "Updated project category", example = "infrastructure", allowableValues = { "development",
             "infrastructure", "collaboration", "training", "community" })
     private ProjectCategoryEnum category;
+
+    @Schema(description = "Updated bank information associated with the project")
+    private Integer bankId;
 }

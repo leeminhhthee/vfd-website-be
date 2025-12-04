@@ -14,11 +14,13 @@ import com.example.spring_vfdwebsite.annotations.LoggableAction;
 import com.example.spring_vfdwebsite.dtos.projectDTOs.ProjectCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.projectDTOs.ProjectResponseDto;
 import com.example.spring_vfdwebsite.dtos.projectDTOs.ProjectUpdateRequestDto;
+import com.example.spring_vfdwebsite.entities.Bank;
 import com.example.spring_vfdwebsite.entities.Project;
 import com.example.spring_vfdwebsite.events.project.ProjectCreatedEvent;
 import com.example.spring_vfdwebsite.events.project.ProjectDeletedEvent;
 import com.example.spring_vfdwebsite.events.project.ProjectUpdatedEvent;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
+import com.example.spring_vfdwebsite.repositories.BankJpaRepository;
 import com.example.spring_vfdwebsite.repositories.ProjectJpaRepository;
 import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
 
@@ -31,6 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final CloudinaryUtils cloudinaryUtils;
     private final ProjectJpaRepository projectRepository;
+    private final BankJpaRepository bankRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     // ===================== Get All =====================
@@ -62,6 +65,9 @@ public class ProjectServiceImpl implements ProjectService {
     @LoggableAction(value =  "CREATE", entity = "projects", description = "Create a new project")
     public ProjectResponseDto createProject(ProjectCreateRequestDto dto) {
 
+        Bank bank = bankRepository.findById(dto.getBankId())
+                .orElseThrow(() -> new EntityNotFoundException("Bank with id " + dto.getBankId() + " not found"));
+
         Project project = Project.builder()
                 .title(dto.getTitle())
                 .overview(dto.getOverview())
@@ -70,6 +76,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .price(dto.getPrice())
                 .imageUrl(dto.getImageUrl())
                 .category(dto.getCategory())
+                .bank(bank)
                 .build();
         project = projectRepository.save(project);
 
@@ -102,6 +109,11 @@ public class ProjectServiceImpl implements ProjectService {
             project.setImageUrl(dto.getImageUrl());
         if (dto.getCategory() != null)
             project.setCategory(dto.getCategory());
+        if (dto.getBankId() != null) {
+            Bank bank = bankRepository.findById(dto.getBankId())
+                    .orElseThrow(() -> new EntityNotFoundException("Bank with id " + dto.getBankId() + " not found"));
+            project.setBank(bank);
+        }
 
         project = projectRepository.save(project);
 
@@ -129,6 +141,17 @@ public class ProjectServiceImpl implements ProjectService {
 
     // ===================== Mapper entity -> DTO =====================
     private ProjectResponseDto toDto(Project project) {
+        ProjectResponseDto.BankDto bankDto = null;
+        if (project.getBank() != null) {
+            bankDto = ProjectResponseDto.BankDto.builder()
+                    .id(project.getBank().getId())
+                    .fullName(project.getBank().getFullName())
+                    .bankName(project.getBank().getBankName())
+                    .accountNumber(project.getBank().getAccountNumber())
+                    .branch(project.getBank().getBranch())
+                    .imageUrl(project.getBank().getImageUrl())
+                    .build();
+        }
         return ProjectResponseDto.builder()
                 .id(project.getId())
                 .title(project.getTitle())
@@ -138,6 +161,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .price(project.getPrice())
                 .imageUrl(project.getImageUrl())
                 .category(project.getCategory())
+                .bank(bankDto)
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
                 .build();

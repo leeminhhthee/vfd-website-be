@@ -43,4 +43,7 @@ public class ProjectCreateRequestDto {
             "infrastructure", "collaboration", "training", "community" }, requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Category is required")
     private ProjectCategoryEnum category;
+
+    @Schema(description = "Bank information associated with the project")
+    private Integer bankId;
 }

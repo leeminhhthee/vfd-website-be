@@ -44,9 +44,26 @@ public class ProjectResponseDto {
     )
     private ProjectCategoryEnum category;
 
+    @Schema(description = "Bank information associated with the project")
+    private BankDto bank;
+
     @Schema(description = "Timestamp when the project record was created", example = "2025-01-10T10:15:30")
     private LocalDateTime createdAt;
 
     @Schema(description = "Timestamp when the project record was last updated", example = "2025-01-15T12:20:45")
     private LocalDateTime updatedAt;
+
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BankDto {
+        private Integer id;
+        private String fullName;
+        private String bankName;
+        private String accountNumber;
+        private String branch;
+        private String imageUrl;
+    }
 }

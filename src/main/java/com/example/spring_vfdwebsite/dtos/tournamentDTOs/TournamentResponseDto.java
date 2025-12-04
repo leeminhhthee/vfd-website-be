@@ -37,6 +37,9 @@ public class TournamentResponseDto {
     @Schema(description = "Status of the tournament", example = "ongoing")
     private TournamentStatusEnum status;
 
+    @Schema(description = "Whether the tournament is visible on the home page", example = "true")
+    private Boolean isVisibleOnHome;
+
     @Schema(description = "Whether registration is open for this tournament", example = "false")
     private Boolean registrationOpen;
 

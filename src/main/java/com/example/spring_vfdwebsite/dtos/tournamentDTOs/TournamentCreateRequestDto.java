@@ -33,6 +33,9 @@ public class TournamentCreateRequestDto {
     @Schema(description = "Location of the tournament", example = "Nhà thi đấu Đại học Đà Nẵng")
     private String location;
 
+    @Schema(description = "Whether the tournament is visible on the home page", example = "true")
+    private Boolean isVisibleOnHome;
+
     @Schema(description = "Whether registration is open for this tournament", example = "false")
     private Boolean registrationOpen;
 

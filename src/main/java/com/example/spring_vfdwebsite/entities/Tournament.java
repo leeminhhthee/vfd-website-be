@@ -52,6 +52,9 @@ public class Tournament extends BaseEntity {
     @Column(name = "status", nullable = false)
     private TournamentStatusEnum status;
 
+    @Column(name = "is_visible_on_home")
+    private Boolean isVisibleOnHome;
+
     @Column(name = "registration_open")
     private Boolean registrationOpen;
 

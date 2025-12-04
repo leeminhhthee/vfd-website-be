@@ -1,5 +1,8 @@
 package com.example.spring_vfdwebsite.entities;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.spring_vfdwebsite.entities.enums.ProjectCategoryEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -52,4 +55,9 @@ public class Project extends BaseEntity {
     @NotNull
     @Column(name = "category", nullable = false)
     private ProjectCategoryEnum category;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "bank_id")
+    private Bank bank;
 }

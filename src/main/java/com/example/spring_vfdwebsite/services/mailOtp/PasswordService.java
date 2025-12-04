@@ -120,7 +120,7 @@ public class PasswordService {
     @LoggableAction(value = "PASSWORD_RESET_INIT", entity = "users", description = "Verify forgot password OTP and issue reset token")
     public String verifyForgotPasswordOtpIssueToken(String email, String otp) {
         // Tìm user (để tránh lộ thông tin, vẫn thống nhất 404 nếu không tồn tại)
-        userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new HttpException("User not found", HttpStatus.NOT_FOUND));
 
         if (!otpRedisService.verifyForgotPasswordOtp(email, otp)) {
@@ -142,10 +142,10 @@ public class PasswordService {
         ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
                 .actionType("PASSWORD_RESET_INIT")
                 .targetTable("users")
-                .targetId(null)
+                .targetId(user.getId())
                 .description("Verify forgot password OTP and issue reset token")
                 .build();
-        activityLogService.createActivityLogResponseDto(null, logDto);
+        activityLogService.createActivityLogResponseDto(user, logDto);
 
         return resetToken;
     }

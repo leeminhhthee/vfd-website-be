@@ -62,6 +62,7 @@ public class TournamentServiceImpl implements TournamentService {
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
                 .location(dto.getLocation())
+                .isVisibleOnHome(dto.getIsVisibleOnHome())
                 .registrationOpen(dto.getRegistrationOpen())
                 .bannerUrl(dto.getBannerUrl())
                 .scheduleImages(dto.getScheduleImages())
@@ -117,6 +118,9 @@ public class TournamentServiceImpl implements TournamentService {
         }
         if (dto.getLocation() != null) {
             tournament.setLocation(dto.getLocation());
+        }
+        if (dto.getIsVisibleOnHome() != null) {
+            tournament.setIsVisibleOnHome(dto.getIsVisibleOnHome());
         }
         if (dto.getRegistrationOpen() != null) {
             tournament.setRegistrationOpen(dto.getRegistrationOpen());
@@ -230,6 +234,7 @@ public class TournamentServiceImpl implements TournamentService {
                 .endDate(tournament.getEndDate())
                 .location(tournament.getLocation())
                 .status(tournament.getStatus())
+                .isVisibleOnHome(tournament.getIsVisibleOnHome())
                 .registrationOpen(tournament.getRegistrationOpen())
                 .bannerUrl(tournament.getBannerUrl())
                 .scheduleImages(tournament.getScheduleImages())
