@@ -16,7 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NewsIndexDto {
     private String id;     
-    private String title;    
+    private String title;  
+    private String slug;  
     private NewsTypeEnum type; 
     private String content;  
     private String imageUrl;    

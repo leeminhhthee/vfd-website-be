@@ -22,6 +22,10 @@ public class NewsUpdateRequestDto {
     @Schema(description = "News title", example = "Giải bóng chuyền Thành phố 2025")
     private String title;
 
+    @Size(max = 255, message = "Slug must be at most 255 characters")
+    @Schema(description = "News slug", example = "giai-bong-chuyen-thanh-pho-2025")
+    private String slug;
+
     @Schema(description = "News type", example = "city", allowableValues = { "city", "international", "inside_vn", "other" })
     private NewsTypeEnum type;
 

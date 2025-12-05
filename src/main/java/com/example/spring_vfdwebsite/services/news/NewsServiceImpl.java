@@ -18,6 +18,7 @@ import com.example.spring_vfdwebsite.dtos.newsDTOs.NewsUpdateRequestDto;
 import com.example.spring_vfdwebsite.dtos.searchDTOs.NewsIndexDto;
 import com.example.spring_vfdwebsite.entities.News;
 import com.example.spring_vfdwebsite.entities.User;
+import com.example.spring_vfdwebsite.entities.enums.NewsStatusEnum;
 import com.example.spring_vfdwebsite.events.news.NewsCreatedEvent;
 import com.example.spring_vfdwebsite.events.news.NewsDeletedEvent;
 import com.example.spring_vfdwebsite.events.news.NewsUpdatedEvent;
@@ -25,6 +26,7 @@ import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.NewsJpaRepository;
 import com.example.spring_vfdwebsite.repositories.UserJpaRepository;
 import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
+import com.example.spring_vfdwebsite.utils.SlugUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -66,7 +68,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     @Transactional
     @CacheEvict(value = "news", allEntries = true)
-    @LoggableAction(value =  "CREATE", entity = "news", description = "Create a new news item")
+    @LoggableAction(value = "CREATE", entity = "news", description = "Create a new news item")
     public NewsResponseDto createNews(NewsCreateRequestDto dto) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -75,8 +77,11 @@ public class NewsServiceImpl implements NewsService {
         User currentUser = userRepository.findByEmailIgnoreCase(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
 
+        String slug = generateUniqueSlug(dto.getTitle());
+
         News news = News.builder()
                 .title(dto.getTitle())
+                .slug(slug)
                 .type(dto.getType())
                 .content(dto.getContent())
                 .imageUrl(dto.getImageUrl())
@@ -96,6 +101,7 @@ public class NewsServiceImpl implements NewsService {
         NewsIndexDto indexDto = NewsIndexDto.builder()
                 .id(savedNews.getId().toString())
                 .title(savedNews.getTitle())
+                .slug(savedNews.getSlug())
                 .type(savedNews.getType())
                 // Chỉ lấy 200 ký tự đầu của content để index cho nhẹ
                 .content(savedNews.getContent().substring(0, Math.min(savedNews.getContent().length(), 200)))
@@ -117,13 +123,17 @@ public class NewsServiceImpl implements NewsService {
     @Transactional
     @CachePut(value = "news", key = "#p0")
     @CacheEvict(value = "news", allEntries = true)
-    @LoggableAction(value =  "UPDATE", entity = "news", description = "Update an existing news item")
+    @LoggableAction(value = "UPDATE", entity = "news", description = "Update an existing news item")
     public NewsResponseDto updateNews(Integer id, NewsUpdateRequestDto dto) {
         News news = newsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("News with id " + id + " not found"));
 
-        if (dto.getTitle() != null)
+        boolean titleChanged = false;
+
+        if (dto.getTitle() != null && !dto.getTitle().equals(news.getTitle())) {
             news.setTitle(dto.getTitle());
+            titleChanged = true;
+        }
         if (dto.getType() != null)
             news.setType(dto.getType());
         if (dto.getContent() != null)
@@ -139,6 +149,10 @@ public class NewsServiceImpl implements NewsService {
             news.setStatus(dto.getStatus());
 
         News updatedNews = newsRepository.save(news);
+        
+        if (titleChanged && updatedNews.getStatus() == NewsStatusEnum.DRAFT) {
+            news.setSlug(generateUniqueSlug(news.getTitle()));
+        }
 
         eventPublisher.publishEvent(new NewsUpdatedEvent(updatedNews.getId(), updatedNews));
         return toDto(updatedNews);
@@ -148,7 +162,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     @Transactional
     @CacheEvict(value = "news", allEntries = true)
-    @LoggableAction(value =  "DELETE", entity = "news", description = "Delete an existing news item")
+    @LoggableAction(value = "DELETE", entity = "news", description = "Delete an existing news item")
     public void deleteNews(Integer id) {
         News news = newsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("News with id " + id + " not found"));
@@ -158,6 +172,16 @@ public class NewsServiceImpl implements NewsService {
         }
         newsRepository.delete(news);
         eventPublisher.publishEvent(new NewsDeletedEvent(id));
+    }
+
+    // ===================== Get By Slug =====================
+    @Override
+    @Cacheable(value = "news", key = "#root.args[0]")
+    @Transactional(readOnly = true)
+    public NewsResponseDto getNewsBySlug(String slug) {
+        News news = newsRepository.findBySlug(slug)
+                .orElseThrow(() -> new EntityNotFoundException("News with slug " + slug + " not found"));
+        return toDto(news);
     }
 
     // =================== Mapping -> Dto ===================
@@ -171,6 +195,7 @@ public class NewsServiceImpl implements NewsService {
         return NewsResponseDto.builder()
                 .id(news.getId())
                 .title(news.getTitle())
+                .slug(news.getSlug())
                 .type(news.getType())
                 .content(news.getContent())
                 .imageUrl(news.getImageUrl())
@@ -180,6 +205,18 @@ public class NewsServiceImpl implements NewsService {
                 .createdAt(news.getCreatedAt())
                 .updatedAt(news.getUpdatedAt())
                 .build();
+    }
+
+    private String generateUniqueSlug(String title) {
+        String baseSlug = SlugUtil.toSlug(title);
+        String slug = baseSlug;
+        int counter = 1;
+
+        while (newsRepository.existsBySlug(slug)) {
+            slug = baseSlug + "-" + counter;
+            counter++;
+        }
+        return slug;
     }
 
 }

@@ -22,6 +22,9 @@ public class NewsResponseDto {
     @Schema(description = "News title", example = "Giải bóng chuyền thành phố Đà Nẵng 2025")
     private String title;
 
+    @Schema(description = "News slug", example = "giai-bong-chuyen-thanh-pho-2025")
+    private String slug;
+
     @Schema(description = "News type", example = "city", allowableValues = { "city", "international", "inside_vn", "other" })
     private NewsTypeEnum type;
 

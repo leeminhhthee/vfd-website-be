@@ -21,6 +21,11 @@ public class NewsCreateRequestDto {
     @Schema(description = "News title", example = "Giải bóng chuyền Thành phố 2025")
     private String title;
 
+    @NotBlank(message = "Slug must not be empty")
+    @Size(max = 255, message = "Slug must be at most 255 characters")
+    @Schema(description = "News slug", example = "giai-bong-chuyen-thanh-pho-2025")
+    private String slug;
+
     @NotNull(message = "Type must not be null")
     @Schema(description = "News type", example = "city", allowableValues = { "city", "international", "inside_vn", "other" })
     private NewsTypeEnum type;

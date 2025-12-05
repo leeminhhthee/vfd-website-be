@@ -30,6 +30,9 @@ public class News extends BaseEntity {
     @Column(name = "title", length = 255, nullable = false)
     private String title;
 
+    @Column(name = "slug", unique = true, nullable = false)
+    private String slug;
+
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "type", nullable = false)

@@ -17,4 +17,6 @@ public interface NewsService {
     NewsResponseDto getNewsById(Integer id);
 
     List<NewsResponseDto> getAllNews();
+
+    NewsResponseDto getNewsBySlug(String slug);
 }

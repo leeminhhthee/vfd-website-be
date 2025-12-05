@@ -51,16 +51,21 @@ public class SecurityConfig {
                                                 .authenticationEntryPoint(this.customAuthenticationEntryPoint)
                                                 .accessDeniedHandler(this.customAccessDeniedHandler))
                                 .authorizeHttpRequests(auth -> auth
-                                                // ✅ Public APIs (không cần đăng nhập)
+
+                                                // Public GET news
+                                                .requestMatchers(HttpMethod.GET, "/api/news/**").permitAll()
+
+                                                // Admin-only POST/PATCH/DELETE news
+                                                .requestMatchers(HttpMethod.POST, "/api/news/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/news/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/news/**").hasRole("ADMIN")
+
                                                 .requestMatchers(
                                                                 "/api/auth/**",
                                                                 "/v3/api-docs/**",
                                                                 "/swagger-ui/**",
                                                                 "/swagger-ui.html")
                                                 .permitAll()
-
-                                                // public news endpoints
-                                                .requestMatchers(HttpMethod.GET, "/api/new/**").permitAll()
 
                                                 .requestMatchers(
                                                                 "/api/user/**",
@@ -69,9 +74,9 @@ public class SecurityConfig {
                                                 .hasAnyRole("USER", "ADMIN")
 
                                                 // 🔐 Admin-only APIs
-                                                .requestMatchers("/api/admin/**",
-                                                                "/api/new/**")
-                                                .hasRole("ADMIN")
+                                                // .requestMatchers("/api/admin/**",
+                                                // "/api/new/**")
+                                                // .hasRole("ADMIN")
 
                                                 // 🔒 Các endpoint còn lại yêu cầu xác thực
                                                 .anyRequest().authenticated())
