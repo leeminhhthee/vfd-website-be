@@ -33,6 +33,10 @@ public class Tournament extends BaseEntity {
     @Column(name = "name", length = 255, nullable = false)
     private String name;
 
+    @Size(max = 255)
+    @Column(name = "slug", length = 255, unique = true)
+    private String slug;
+
     @Lob
     @Column(name = "description", columnDefinition = "LONGTEXT")
     private String description;

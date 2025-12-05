@@ -25,6 +25,10 @@ public class TournamentUpdateRequestDto {
     @Schema(description = "Name of the tournament", example = "Giải Bóng Chuyền SV6 2025")
     private String name;
 
+    @Size(max = 255)
+    @Schema(description = "Slug of the tournament", example = "giai-bong-chuyen-sv6-2025")
+    private String slug;
+
     @Schema(description = "Description of the tournament", example = "Giải đấu quy mô quốc gia dành cho sinh viên...")
     private String description;
 

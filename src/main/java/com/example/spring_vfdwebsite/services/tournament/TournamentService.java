@@ -16,4 +16,6 @@ public interface TournamentService {
     List<TournamentResponseDto> getAllTournaments();
 
     void deleteTournament(Integer id);
+
+    TournamentResponseDto getTournamentBySlug(String slug);
 }

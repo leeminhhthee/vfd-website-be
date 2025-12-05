@@ -29,6 +29,7 @@ import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.DocumentJpaRepository;
 import com.example.spring_vfdwebsite.repositories.TournamentJpaRepository;
 import com.example.spring_vfdwebsite.repositories.UserJpaRepository;
+import com.example.spring_vfdwebsite.utils.SlugUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,7 +46,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     @CacheEvict(value = "tournaments", allEntries = true)
-    @LoggableAction(value =  "CREATE", entity = "tournaments", description = "Create a new tournament")
+    @LoggableAction(value = "CREATE", entity = "tournaments", description = "Create a new tournament")
     public TournamentResponseDto createTournament(TournamentCreateRequestDto dto) {
 
         // Lấy user hiện tại
@@ -55,9 +56,12 @@ public class TournamentServiceImpl implements TournamentService {
         User currentUser = userRepository.findByEmailIgnoreCase(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
 
+        String slug = generateUniqueSlug(dto.getName());
+
         // Tạo Tournament entity
         Tournament tournament = Tournament.builder()
                 .name(dto.getName())
+                .slug(slug)
                 .description(dto.getDescription())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
@@ -99,10 +103,12 @@ public class TournamentServiceImpl implements TournamentService {
     @Transactional
     @CachePut(value = "tournaments", key = "#p0")
     @CacheEvict(value = "tournaments", key = "'all'")
-    @LoggableAction(value =  "UPDATE", entity = "tournaments", description = "Update an existing tournament")
+    @LoggableAction(value = "UPDATE", entity = "tournaments", description = "Update an existing tournament")
     public TournamentResponseDto updateTournament(Integer tournamentId, TournamentUpdateRequestDto dto) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
+
+        boolean nameChanged = dto.getName() != null && !dto.getName().equals(tournament.getName());
 
         if (dto.getName() != null) {
             tournament.setName(dto.getName());
@@ -149,6 +155,11 @@ public class TournamentServiceImpl implements TournamentService {
 
         tournament.setStatus(determineStatus(tournament.getStartDate(), tournament.getEndDate()));
 
+        boolean slugMissing = tournament.getSlug() == null || tournament.getSlug().isBlank();
+        if (slugMissing || nameChanged) {
+            tournament.setSlug(generateUniqueSlug(tournament.getName()));
+        }
+
         Tournament updatedTournament = tournamentRepository.save(tournament);
 
         eventPublisher.publishEvent(new TournamentUpdatedEvent(updatedTournament.getId(), updatedTournament));
@@ -182,12 +193,22 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     @CacheEvict(value = "tournaments", key = "'all'")
-    @LoggableAction(value =  "DELETE", entity = "tournaments", description = "Delete an existing tournament")
+    @LoggableAction(value = "DELETE", entity = "tournaments", description = "Delete an existing tournament")
     public void deleteTournament(Integer tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
         tournamentRepository.delete(tournament);
         eventPublisher.publishEvent(new TournamentDeletedEvent(tournamentId));
+    }
+
+    // ===================== Get By Slug =====================
+    @Override
+    @Cacheable(value = "tournaments", key = "#root.args[0]")
+    @Transactional(readOnly = true)
+    public TournamentResponseDto getTournamentBySlug(String slug) {
+        Tournament tournament = tournamentRepository.findBySlug(slug)
+                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with slug: " + slug));
+        return toDto(tournament);
     }
 
     // ===================== Mapping -> Dto =====================
@@ -229,6 +250,7 @@ public class TournamentServiceImpl implements TournamentService {
         return TournamentResponseDto.builder()
                 .id(tournament.getId())
                 .name(tournament.getName())
+                .slug(tournament.getSlug())
                 .description(tournament.getDescription())
                 .startDate(tournament.getStartDate())
                 .endDate(tournament.getEndDate())
@@ -257,6 +279,18 @@ public class TournamentServiceImpl implements TournamentService {
         if (endDate != null && !today.isBefore(endDate))
             return TournamentStatusEnum.ENDED;
         return TournamentStatusEnum.UPCOMING;
+    }
+
+    private String generateUniqueSlug(String title) {
+        String baseSlug = SlugUtil.toSlug(title);
+        String slug = baseSlug;
+        int counter = 1;
+
+        while (tournamentRepository.existsBySlug(slug)) {
+            slug = baseSlug + "-" + counter;
+            counter++;
+        }
+        return slug;
     }
 
 }
