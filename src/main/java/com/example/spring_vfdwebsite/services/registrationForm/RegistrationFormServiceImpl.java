@@ -16,6 +16,7 @@ import com.example.spring_vfdwebsite.dtos.registrationFormDTOs.*;
 import com.example.spring_vfdwebsite.entities.RegistrationForm;
 import com.example.spring_vfdwebsite.entities.Tournament;
 import com.example.spring_vfdwebsite.entities.enums.RegistrationStatusEnum;
+import com.example.spring_vfdwebsite.entities.enums.TournamentStatusEnum;
 import com.example.spring_vfdwebsite.events.registrationForm.RegistrationFormCreatedEvent;
 import com.example.spring_vfdwebsite.events.registrationForm.RegistrationFormDeletedEvent;
 import com.example.spring_vfdwebsite.events.registrationForm.RegistrationFormUpdatedEvent;
@@ -72,6 +73,18 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Tournament with id " + dto.getTournamentId() + " not found"));
+        // nếu mà giải đấu đã bắt đầu và kết thúc thì không cho đăng ký
+        if (tournament.getStatus() != null &&
+                (tournament.getStatus() == TournamentStatusEnum.ONGOING ||
+                        tournament.getStatus() == TournamentStatusEnum.ENDED)) {
+            throw new HttpException("Cannot register for a tournament that has already started or ended",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        // nếu mà giải đã đóng đăng ký thì không cho đăng ký
+        if (tournament.getRegistrationOpen() == Boolean.FALSE) {
+            throw new HttpException("Registration for this tournament is closed", HttpStatus.BAD_REQUEST);
+        }
 
         RegistrationForm form = RegistrationForm.builder()
                 .fullName(dto.getFullName())

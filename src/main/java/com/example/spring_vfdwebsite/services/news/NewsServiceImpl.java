@@ -148,11 +148,15 @@ public class NewsServiceImpl implements NewsService {
         if (dto.getStatus() != null)
             news.setStatus(dto.getStatus());
 
-        News updatedNews = newsRepository.save(news);
-        
-        if (titleChanged && updatedNews.getStatus() == NewsStatusEnum.DRAFT) {
+        boolean slugMissing = news.getSlug() == null || news.getSlug().isBlank();
+
+        if (slugMissing) {
+            news.setSlug(generateUniqueSlug(news.getTitle()));
+        } else if (titleChanged && news.getStatus() == NewsStatusEnum.DRAFT) {
             news.setSlug(generateUniqueSlug(news.getTitle()));
         }
+
+        News updatedNews = newsRepository.save(news);
 
         eventPublisher.publishEvent(new NewsUpdatedEvent(updatedNews.getId(), updatedNews));
         return toDto(updatedNews);

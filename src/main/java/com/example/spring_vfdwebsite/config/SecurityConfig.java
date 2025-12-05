@@ -60,6 +60,79 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.PATCH, "/api/news/**").hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.DELETE, "/api/news/**").hasRole("ADMIN")
 
+                                                // Public APIs
+                                                .requestMatchers(HttpMethod.GET, "/api/affected-objects/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/banks/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/board-directors/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/documents/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/galleries/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/heroes/**").permitAll()                                                
+                                                .requestMatchers(HttpMethod.GET, "/api/match-schedules/**").permitAll()                                                
+                                                .requestMatchers(HttpMethod.GET, "/api/match-schedule-drafts/**").permitAll()                                                
+                                                .requestMatchers(HttpMethod.GET, "/api/partners/**").permitAll()                                                
+                                                .requestMatchers(HttpMethod.GET, "/api/projects/**").permitAll()                                                
+                                                .requestMatchers(HttpMethod.GET, "/api/public/search/**").permitAll()                                                
+                                                .requestMatchers(HttpMethod.GET, "/api/tournaments/**").permitAll() 
+                                                .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll() 
+                                                .requestMatchers(HttpMethod.POST, "/api/registration-forms/**").permitAll()
+
+                                                // Private APIs
+                                                .requestMatchers(HttpMethod.POST, "/api/affected-objects/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/affected-objects/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/affected-objects/**").hasRole("ADMIN")
+                                                
+                                                .requestMatchers(HttpMethod.POST, "/api/banks/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/banks/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/banks/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/board-directors/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/board-directors/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/board-directors/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/documents/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/documents/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/documents/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/galleries/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/galleries/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/galleries/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/heroes/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/heroes/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/heroes/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/match-schedules/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/match-schedules/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/match-schedules/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/match-schedule-drafts/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/match-schedule-drafts/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/match-schedule-drafts/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/partners/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/partners/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/partners/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/projects/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/projects/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/projects/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/public/search/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/public/search/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/public/search/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/tournaments/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/tournaments/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/tournaments/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/users/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+
+                                                .requestMatchers(HttpMethod.GET, "/api/registration-forms/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/registration-forms/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/registration-forms/**").hasRole("ADMIN")
+
                                                 .requestMatchers(
                                                                 "/api/auth/**",
                                                                 "/v3/api-docs/**",
