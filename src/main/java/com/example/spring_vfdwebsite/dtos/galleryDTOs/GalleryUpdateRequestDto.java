@@ -24,6 +24,10 @@ public class GalleryUpdateRequestDto {
     @Schema(description = "Gallery title", example = "Giải bóng chuyền Thành phố 2025")
     private String title;
 
+    @Size(max = 255, message = "Slug must be at most 255 characters")
+    @Schema(description = "Gallery slug", example = "giai-bong-chuyen-thanh-pho-2025")
+    private String slug;
+
     @Schema(description = "Gallery category", example = "team", allowableValues = { "inside", "team", "other" })
     private GalleryCategoryEnum category;
 

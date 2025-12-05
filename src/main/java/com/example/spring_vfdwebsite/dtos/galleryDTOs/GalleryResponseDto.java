@@ -22,6 +22,9 @@ public class GalleryResponseDto {
     @Schema(description = "Gallery title", example = "Nhận quyết định thành lập CLB bóng chuyền cộng đồng")
     private String title;
 
+    @Schema(description = "Gallery slug", example = "nhan-quyet-dinh-thanh-lap-clb-bong-chuyen-cong-dong")
+    private String slug;
+
     @Schema(description = "Gallery category", example = "other", allowableValues = { "inside", "team", "other" })
     private GalleryCategoryEnum category;
 

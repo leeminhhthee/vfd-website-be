@@ -34,6 +34,9 @@ public class Gallery extends BaseEntity {
     @Column(name = "title", length = 255, nullable = false)
     private String title;
 
+    @Column(name = "slug", unique = true, nullable = false)
+    private String slug;
+
     @ElementCollection
     @CollectionTable(name = "gallery_images", joinColumns = @JoinColumn(name = "gallery_id"))
     @Column(name = "image_url")

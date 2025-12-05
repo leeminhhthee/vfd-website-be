@@ -17,5 +17,7 @@ public interface GalleryService {
     List<GalleryResponseDto> getAllGalleries();
 
     void deleteGallery(Integer id);
+
+    GalleryResponseDto getGalleryBySlug(String slug);
     
 }

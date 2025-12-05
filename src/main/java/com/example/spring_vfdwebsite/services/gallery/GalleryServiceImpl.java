@@ -23,6 +23,7 @@ import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.GalleryJpaRepository;
 import com.example.spring_vfdwebsite.repositories.TournamentJpaRepository;
 import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
+import com.example.spring_vfdwebsite.utils.SlugUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -62,7 +63,7 @@ public class GalleryServiceImpl implements GalleryService {
     @Override
     @Transactional
     @CacheEvict(value = "galleries", allEntries = true)
-    @LoggableAction(value =  "CREATE", entity = "galleries", description = "Create new gallery")
+    @LoggableAction(value = "CREATE", entity = "galleries", description = "Create new gallery")
     public GalleryResponseDto createGallery(GalleryCreateRequestDto dto) {
 
         Tournament tournament = null;
@@ -72,8 +73,11 @@ public class GalleryServiceImpl implements GalleryService {
                             () -> new EntityNotFoundException("Tournament not found with id " + dto.getTournament()));
         }
 
+        String slug = generateUniqueSlug(dto.getTitle());
+
         Gallery gallery = Gallery.builder()
                 .title(dto.getTitle())
+                .slug(slug)
                 .category(dto.getCategory())
                 .imageUrl(dto.getImageUrl())
                 .tournament(tournament)
@@ -92,10 +96,12 @@ public class GalleryServiceImpl implements GalleryService {
     @Transactional
     @CacheEvict(value = "galleries", allEntries = true)
     @CachePut(value = "galleries", key = "#p0")
-    @LoggableAction(value =  "UPDATE", entity = "galleries", description = "Update gallery")
+    @LoggableAction(value = "UPDATE", entity = "galleries", description = "Update gallery")
     public GalleryResponseDto updateGallery(Integer id, GalleryUpdateRequestDto dto) {
         Gallery gallery = galleryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Gallery not found with id " + id));
+
+        boolean titleChanged = dto.getTitle() != null && !dto.getTitle().equals(gallery.getTitle());
 
         if (dto.getTitle() != null) {
             gallery.setTitle(dto.getTitle());
@@ -117,6 +123,10 @@ public class GalleryServiceImpl implements GalleryService {
             // Cập nhật list ảnh mới
             gallery.setImageUrl(newImages);
         }
+        boolean slugMissing = gallery.getSlug() == null || gallery.getSlug().isBlank();
+        if (slugMissing || titleChanged) {
+            gallery.setSlug(generateUniqueSlug(gallery.getTitle()));
+        }
 
         Gallery updatedGallery = galleryRepository.save(gallery);
 
@@ -130,7 +140,7 @@ public class GalleryServiceImpl implements GalleryService {
     @Override
     @Transactional
     @CacheEvict(value = "galleries", allEntries = true)
-    @LoggableAction(value =  "DELETE", entity = "galleries", description = "Delete gallery")
+    @LoggableAction(value = "DELETE", entity = "galleries", description = "Delete gallery")
     public void deleteGallery(Integer id) {
         Gallery gallery = galleryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Gallery not found with id " + id));
@@ -143,6 +153,16 @@ public class GalleryServiceImpl implements GalleryService {
 
         // Publish event
         eventPublisher.publishEvent(new GalleryDeletedEvent(id));
+    }
+
+    // ===================== Get By Slug =====================
+    @Override
+    @Cacheable(value = "galleries", key = "#root.args[0]")
+    @Transactional(readOnly = true)
+    public GalleryResponseDto getGalleryBySlug(String slug) {
+        Gallery gallery = galleryRepository.findBySlug(slug)
+                .orElseThrow(() -> new EntityNotFoundException("Gallery not found with slug " + slug));
+        return toDto(gallery);
     }
 
     // ===================== Mapper entity -> DTO =====================
@@ -158,11 +178,24 @@ public class GalleryServiceImpl implements GalleryService {
         return GalleryResponseDto.builder()
                 .id(gallery.getId())
                 .title(gallery.getTitle())
+                .slug(gallery.getSlug())
                 .category(gallery.getCategory())
                 .imageUrl(gallery.getImageUrl())
                 .tournament(tournamentDto)
                 .createdAt(gallery.getCreatedAt())
                 .updatedAt(gallery.getUpdatedAt())
                 .build();
+    }
+
+    private String generateUniqueSlug(String title) {
+        String baseSlug = SlugUtil.toSlug(title);
+        String slug = baseSlug;
+        int counter = 1;
+
+        while (galleryRepository.existsBySlug(slug)) {
+            slug = baseSlug + "-" + counter;
+            counter++;
+        }
+        return slug;
     }
 }

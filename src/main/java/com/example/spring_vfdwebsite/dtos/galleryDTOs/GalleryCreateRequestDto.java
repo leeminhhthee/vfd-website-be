@@ -23,6 +23,11 @@ public class GalleryCreateRequestDto {
     @Schema(description = "Gallery title", example = "Giải bóng chuyền Thành phố 2025")
     private String title;
 
+    @NotBlank(message = "Slug must not be empty")
+    @Size(max = 255, message = "Slug must be at most 255 characters")
+    @Schema(description = "Gallery slug", example = "giai-bong-chuyen-thanh-pho-2025")
+    private String slug;
+
     @NotNull(message = "Category must not be null")
     @Schema(description = "Gallery category", example = "inside", allowableValues = { "inside", "team", "other" })
     private GalleryCategoryEnum category;

@@ -83,4 +83,16 @@ public class GalleryController {
                 galleryService.deleteGallery(id);
                 return ResponseEntity.noContent().build();
         }
+
+        // ===================== Get Gallery By Slug =====================
+        @Operation(summary = "Get gallery by slug", description = "Retrieve gallery details by slug", responses = {
+                        @ApiResponse(responseCode = "200", description = "Gallery found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GalleryResponseDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Gallery not found")
+        })
+        @GetMapping("/slug/{slug}")
+        public ResponseEntity<GalleryResponseDto> getGalleryBySlug(
+                        @Parameter(description = "Slug of the gallery", required = true) @PathVariable("slug") String slug) {
+                GalleryResponseDto gallery = galleryService.getGalleryBySlug(slug);
+                return ResponseEntity.ok(gallery);
+        }
 }
