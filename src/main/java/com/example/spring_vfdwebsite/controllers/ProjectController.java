@@ -23,65 +23,77 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(name = "Project Controller", description = "API endpoints for managing projects")
 public class ProjectController {
-    private final ProjectService projectService;
+        private final ProjectService projectService;
 
-    // ===================== Get All =====================
-    @Operation(summary = "Get all projects", description = "Retrieve a list of all projects", responses = {
-            @ApiResponse(responseCode = "200", description = "List of projects", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class)))
-    })
-    @GetMapping
-    public ResponseEntity<List<ProjectResponseDto>> getAllProjects() {
-        List<ProjectResponseDto> projects = projectService.getAllProjects();
-        return ResponseEntity.ok(projects);
-    }
+        // ===================== Get All =====================
+        @Operation(summary = "Get all projects", description = "Retrieve a list of all projects", responses = {
+                        @ApiResponse(responseCode = "200", description = "List of projects", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class)))
+        })
+        @GetMapping
+        public ResponseEntity<List<ProjectResponseDto>> getAllProjects() {
+                List<ProjectResponseDto> projects = projectService.getAllProjects();
+                return ResponseEntity.ok(projects);
+        }
 
-    // ===================== Get By Id =====================
-    @Operation(summary = "Get project by ID", description = "Retrieve project details by ID", responses = {
-            @ApiResponse(responseCode = "200", description = "Project found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "Project not found")
-    })
-    @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> getProjectById(
-            @Parameter(description = "ID of the project", required = true) @PathVariable("id") Integer id) {
-        ProjectResponseDto project = projectService.getProjectById(id);
-        return ResponseEntity.ok(project);
-    }
+        // ===================== Get By Id =====================
+        @Operation(summary = "Get project by ID", description = "Retrieve project details by ID", responses = {
+                        @ApiResponse(responseCode = "200", description = "Project found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Project not found")
+        })
+        @GetMapping("/{id}")
+        public ResponseEntity<ProjectResponseDto> getProjectById(
+                        @Parameter(description = "ID of the project", required = true) @PathVariable("id") Integer id) {
+                ProjectResponseDto project = projectService.getProjectById(id);
+                return ResponseEntity.ok(project);
+        }
 
-    // ===================== Create =====================
-    @Operation(summary = "Create new project", description = "Create a new project with details", responses = {
-            @ApiResponse(responseCode = "200", description = "Project created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
-    @PostMapping
-    public ResponseEntity<ProjectResponseDto> createProject(
-            @RequestBody ProjectCreateRequestDto dto) {
-        ProjectResponseDto createdProject = projectService.createProject(dto);
-        return ResponseEntity.ok(createdProject);
-    }
+        // ===================== Create =====================
+        @Operation(summary = "Create new project", description = "Create a new project with details", responses = {
+                        @ApiResponse(responseCode = "200", description = "Project created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Invalid input")
+        })
+        @PostMapping
+        public ResponseEntity<ProjectResponseDto> createProject(
+                        @RequestBody ProjectCreateRequestDto dto) {
+                ProjectResponseDto createdProject = projectService.createProject(dto);
+                return ResponseEntity.ok(createdProject);
+        }
 
-    // ===================== Update =====================
-    @Operation(summary = "Update project", description = "Update project details", responses = {
-            @ApiResponse(responseCode = "200", description = "Project updated", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "Project not found")
-    })
-    @PatchMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> updateProject(
-            @PathVariable("id") Integer id,
-            @RequestBody ProjectUpdateRequestDto dto) {
-        dto.setId(id);
-        ProjectResponseDto updatedProject = projectService.updateProject(id, dto);
-        return ResponseEntity.ok(updatedProject);
-    }
+        // ===================== Update =====================
+        @Operation(summary = "Update project", description = "Update project details", responses = {
+                        @ApiResponse(responseCode = "200", description = "Project updated", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Project not found")
+        })
+        @PatchMapping("/{id}")
+        public ResponseEntity<ProjectResponseDto> updateProject(
+                        @PathVariable("id") Integer id,
+                        @RequestBody ProjectUpdateRequestDto dto) {
+                dto.setId(id);
+                ProjectResponseDto updatedProject = projectService.updateProject(id, dto);
+                return ResponseEntity.ok(updatedProject);
+        }
 
-    // ===================== Delete =====================
-    @Operation(summary = "Delete project", description = "Delete a project by ID", responses = {
-            @ApiResponse(responseCode = "204", description = "Project deleted"),
-            @ApiResponse(responseCode = "404", description = "Project not found")
-    })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProject(
-            @Parameter(description = "ID of the project", required = true) @PathVariable("id") Integer id) {
-        projectService.deleteProject(id);
-        return ResponseEntity.noContent().build();
-    }
+        // ===================== Delete =====================
+        @Operation(summary = "Delete project", description = "Delete a project by ID", responses = {
+                        @ApiResponse(responseCode = "204", description = "Project deleted"),
+                        @ApiResponse(responseCode = "404", description = "Project not found")
+        })
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> deleteProject(
+                        @Parameter(description = "ID of the project", required = true) @PathVariable("id") Integer id) {
+                projectService.deleteProject(id);
+                return ResponseEntity.noContent().build();
+        }
+
+        // ===================== Get By Slug =====================
+        @Operation(summary = "Get project by slug", description = "Retrieve project details by slug", responses = {
+                        @ApiResponse(responseCode = "200", description = "Project found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Project not found")
+        })
+        @GetMapping("/slug/{slug}")
+        public ResponseEntity<ProjectResponseDto> getProjectBySlug(
+                        @Parameter(description = "Slug of the project", required = true) @PathVariable("slug") String slug) {
+                ProjectResponseDto project = projectService.getProjectBySlug(slug);
+                return ResponseEntity.ok(project);
+        }
 }

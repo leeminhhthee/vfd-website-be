@@ -20,6 +20,9 @@ public class ProjectCreateRequestDto {
     @Size(max = 255)
     private String title;
 
+    @Schema(description = "Slug for the project", example = "du-an-phat-trien-bong-chuyen-tre")
+    private String slug;
+
     @Schema(description = "Overview of the project", example = "Chương trình phát triển tài năng bóng chuyền cho các vận động viên trẻ...")
     private String overview;
 

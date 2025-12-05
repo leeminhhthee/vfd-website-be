@@ -23,6 +23,7 @@ import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.repositories.BankJpaRepository;
 import com.example.spring_vfdwebsite.repositories.ProjectJpaRepository;
 import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
+import com.example.spring_vfdwebsite.utils.SlugUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -62,14 +63,17 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     @CacheEvict(value = "projects", allEntries = true)
-    @LoggableAction(value =  "CREATE", entity = "projects", description = "Create a new project")
+    @LoggableAction(value = "CREATE", entity = "projects", description = "Create a new project")
     public ProjectResponseDto createProject(ProjectCreateRequestDto dto) {
 
         Bank bank = bankRepository.findById(dto.getBankId())
                 .orElseThrow(() -> new EntityNotFoundException("Bank with id " + dto.getBankId() + " not found"));
 
+        String slug = generateUniqueSlug(dto.getTitle());
+
         Project project = Project.builder()
                 .title(dto.getTitle())
+                .slug(slug)
                 .overview(dto.getOverview())
                 .duration(dto.getDuration())
                 .location(dto.getLocation())
@@ -90,10 +94,12 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @CachePut(value = "projects", key = "#p0")
     @CacheEvict(value = { "projects" }, allEntries = true)
-    @LoggableAction(value =  "UPDATE", entity = "projects", description = "Update an existing project")
+    @LoggableAction(value = "UPDATE", entity = "projects", description = "Update an existing project")
     public ProjectResponseDto updateProject(Integer id, ProjectUpdateRequestDto dto) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Project with id " + id + " not found"));
+
+        boolean titleChanged = dto.getTitle() != null && !dto.getTitle().equals(project.getTitle());
 
         if (dto.getTitle() != null)
             project.setTitle(dto.getTitle());
@@ -114,6 +120,10 @@ public class ProjectServiceImpl implements ProjectService {
                     .orElseThrow(() -> new EntityNotFoundException("Bank with id " + dto.getBankId() + " not found"));
             project.setBank(bank);
         }
+        boolean slugMissing = project.getSlug() == null || project.getSlug().isBlank();
+        if (slugMissing || titleChanged) {
+            project.setSlug(generateUniqueSlug(project.getTitle()));
+        }
 
         project = projectRepository.save(project);
 
@@ -126,17 +136,27 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     @CacheEvict(value = { "projects" }, allEntries = true)
-    @LoggableAction(value =  "DELETE", entity = "projects", description = "Delete an existing project")
+    @LoggableAction(value = "DELETE", entity = "projects", description = "Delete an existing project")
     public void deleteProject(Integer id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Project with id " + id + " not found"));
-                
+
         if (project.getImageUrl() != null) {
             cloudinaryUtils.deleteFile(project.getImageUrl());
         }
 
         projectRepository.deleteById(id);
         eventPublisher.publishEvent(new ProjectDeletedEvent(id));
+    }
+
+    // ===================== Get By Slug =====================
+    @Override
+    @Cacheable(value = "projects", key = "#root.args[0]")
+    @Transactional(readOnly = true)
+    public ProjectResponseDto getProjectBySlug(String slug) {
+        Project project = projectRepository.findBySlug(slug)
+                .orElseThrow(() -> new EntityNotFoundException("Project with slug " + slug + " not found"));
+        return toDto(project);
     }
 
     // ===================== Mapper entity -> DTO =====================
@@ -155,6 +175,7 @@ public class ProjectServiceImpl implements ProjectService {
         return ProjectResponseDto.builder()
                 .id(project.getId())
                 .title(project.getTitle())
+                .slug(project.getSlug())
                 .overview(project.getOverview())
                 .duration(project.getDuration())
                 .location(project.getLocation())
@@ -165,5 +186,17 @@ public class ProjectServiceImpl implements ProjectService {
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
                 .build();
+    }
+
+    private String generateUniqueSlug(String title) {
+        String baseSlug = SlugUtil.toSlug(title);
+        String slug = baseSlug;
+        int counter = 1;
+
+        while (projectRepository.existsBySlug(slug)) {
+            slug = baseSlug + "-" + counter;
+            counter++;
+        }
+        return slug;
     }
 }

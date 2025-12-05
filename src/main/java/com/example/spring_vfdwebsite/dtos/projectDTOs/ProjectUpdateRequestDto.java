@@ -21,6 +21,9 @@ public class ProjectUpdateRequestDto {
     @Size(max = 255)
     private String title;
 
+    @Schema(description = "Updated project slug", example = "du-an-phat-trien-bong-chuyen-tre-nang-cao")
+    private String slug;
+
     @Schema(description = "Updated project overview", example = "Chương trình nâng cao kỹ năng bóng chuyền cho VĐV trẻ...")
     private String overview;
 

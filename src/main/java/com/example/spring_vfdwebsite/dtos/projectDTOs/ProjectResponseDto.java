@@ -22,6 +22,9 @@ public class ProjectResponseDto {
     @Schema(description = "Project title", example = "Dự án phát triển bóng chuyền trẻ")
     private String title;
 
+    @Schema(description = "Project slug", example = "du-an-phat-trien-bong-chuyen-tre")
+    private String slug;
+
     @Schema(description = "Project overview", example = "Chương trình phát triển tài năng bóng chuyền cho các vận động viên trẻ...")
     private String overview;
 

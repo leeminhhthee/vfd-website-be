@@ -17,5 +17,7 @@ public interface ProjectService {
     ProjectResponseDto updateProject(Integer id, ProjectUpdateRequestDto dto);
 
     void deleteProject(Integer id);
+
+    ProjectResponseDto getProjectBySlug(String slug);
     
 }

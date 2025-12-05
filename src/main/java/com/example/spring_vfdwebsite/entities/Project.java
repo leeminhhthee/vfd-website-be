@@ -30,6 +30,9 @@ public class Project extends BaseEntity {
     @Column(name = "title", length = 255, nullable = false)
     private String title;
 
+    @Column(name = "slug", unique = true, nullable = false)
+    private String slug;
+
     @Lob
     @Column(name = "overview", columnDefinition = "LONGTEXT")
     private String overview;
