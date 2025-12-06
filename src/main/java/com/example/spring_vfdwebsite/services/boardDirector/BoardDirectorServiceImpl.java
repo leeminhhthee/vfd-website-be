@@ -128,7 +128,7 @@ public class BoardDirectorServiceImpl implements BoardDirectorService {
 
     // Delete director
     @Override
-    @CacheEvict(value = "board-directors", key = "#id")
+    @CacheEvict(value = "board-directors", allEntries = true)
     @LoggableAction(value =  "DELETE", entity = "board_directors", description = "Delete board director")
     public void deleteBoardDirector(Integer id) {
         BoardDirector director = boardDirectorRepository.findById(id)
