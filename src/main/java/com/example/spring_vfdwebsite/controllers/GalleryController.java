@@ -95,4 +95,17 @@ public class GalleryController {
                 GalleryResponseDto gallery = galleryService.getGalleryBySlug(slug);
                 return ResponseEntity.ok(gallery);
         }
+
+        // ===================== Get Gallery By ID and Slug =====================
+        @Operation(summary = "Get gallery by ID and slug", description = "Retrieve gallery details by ID and slug", responses = {
+                        @ApiResponse(responseCode = "200", description = "Gallery found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GalleryResponseDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Gallery not found")
+        })
+        @GetMapping("/{id}/{slug}")
+        public ResponseEntity<GalleryResponseDto> getGalleryByIdSlug(
+                        @Parameter(description = "ID of the gallery", required = true) @PathVariable("id") Integer id,
+                        @Parameter(description = "Slug of the gallery", required = true) @PathVariable("slug") String slug) {
+                GalleryResponseDto gallery = galleryService.getGalleryByIdSlug(id, slug);
+                return ResponseEntity.ok(gallery);
+        }
 }

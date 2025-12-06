@@ -10,4 +10,5 @@ import com.example.spring_vfdwebsite.entities.Gallery;
 public interface GalleryJpaRepository extends JpaRepository<Gallery, Integer> {
     Optional<Gallery> findBySlug(String slug);
     boolean existsBySlug(String slug);
+    Optional<Gallery> findByIdAndSlug(Integer id, String slug);
 }

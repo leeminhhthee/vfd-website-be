@@ -19,5 +19,7 @@ public interface GalleryService {
     void deleteGallery(Integer id);
 
     GalleryResponseDto getGalleryBySlug(String slug);
+
+    GalleryResponseDto getGalleryByIdSlug(Integer id, String slug);
     
 }

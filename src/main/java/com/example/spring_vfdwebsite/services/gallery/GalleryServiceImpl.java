@@ -165,6 +165,16 @@ public class GalleryServiceImpl implements GalleryService {
         return toDto(gallery);
     }
 
+    // ===================== Get By Id and Slug =====================
+    @Override
+    @Cacheable(value = "galleries", key = "#root.args[0] + '-' + #root.args[1]")
+    @Transactional(readOnly = true)
+    public GalleryResponseDto getGalleryByIdSlug(Integer id, String slug) {
+        Gallery gallery = galleryRepository.findByIdAndSlug(id, slug)
+                .orElseThrow(() -> new EntityNotFoundException("Gallery not found with id " + id + " and slug " + slug));
+        return toDto(gallery);
+    }
+
     // ===================== Mapper entity -> DTO =====================
     private GalleryResponseDto toDto(Gallery gallery) {
         GalleryResponseDto.TournamentDto tournamentDto = null;
