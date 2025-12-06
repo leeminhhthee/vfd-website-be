@@ -18,4 +18,6 @@ public interface TournamentService {
     void deleteTournament(Integer id);
 
     TournamentResponseDto getTournamentBySlug(String slug);
+
+    TournamentResponseDto getTournamentByIdSlug(Integer id, String slug);
 }

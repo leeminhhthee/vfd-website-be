@@ -211,6 +211,16 @@ public class TournamentServiceImpl implements TournamentService {
         return toDto(tournament);
     }
 
+    // ===================== Get By Id and Slug =====================
+    @Override
+    @Cacheable(value = "tournaments", key = "#root.args[0] + '-' + #root.args[1]")
+    @Transactional(readOnly = true)
+    public TournamentResponseDto getTournamentByIdSlug(Integer id, String slug) {
+        Tournament tournament = tournamentRepository.findByIdAndSlug(id, slug)
+                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id " + id + " and slug " + slug));
+        return toDto(tournament);
+    }
+
     // ===================== Mapping -> Dto =====================
     private TournamentResponseDto toDto(Tournament tournament) {
         TournamentResponseDto.CreatedByDto createdByDto = TournamentResponseDto.CreatedByDto.builder()

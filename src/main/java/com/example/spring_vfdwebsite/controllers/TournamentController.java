@@ -96,4 +96,17 @@ public class TournamentController {
                 TournamentResponseDto tournament = tournamentService.getTournamentBySlug(slug);
                 return ResponseEntity.ok(tournament);
         }
+
+        // ===================== Get By Id and Slug =====================
+        @GetMapping("/{id}/{slug}")
+        @Operation(summary = "Get a tournament by ID and slug", description = "Retrieve the details of a tournament by its ID and slug", responses = {
+                        @ApiResponse(responseCode = "200", description = "Tournament retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TournamentResponseDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Tournament not found")
+        })
+        public ResponseEntity<TournamentResponseDto> getTournamentByIdSlug(
+                        @Parameter(description = "ID of the tournament to retrieve") @PathVariable("id") Integer id,
+                        @Parameter(description = "Slug of the tournament to retrieve") @PathVariable("slug") String slug) {
+                TournamentResponseDto tournament = tournamentService.getTournamentByIdSlug(id, slug);
+                return ResponseEntity.ok(tournament);
+        }
 }

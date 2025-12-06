@@ -12,4 +12,6 @@ public interface TournamentJpaRepository extends JpaRepository<Tournament, Integ
     Optional<Tournament> findBySlug(String slug);
 
     boolean existsBySlug(String slug);
+
+    Optional<Tournament> findByIdAndSlug(Integer id, String slug);
 }
