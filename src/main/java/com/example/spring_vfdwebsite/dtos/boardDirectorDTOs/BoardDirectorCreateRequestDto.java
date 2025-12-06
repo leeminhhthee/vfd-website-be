@@ -2,7 +2,7 @@ package com.example.spring_vfdwebsite.dtos.boardDirectorDTOs;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+// import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -24,7 +24,7 @@ public class BoardDirectorCreateRequestDto {
     private String email;
 
     @Schema(description = "Phone number of the board director (10 digits)", example = "0912345678")
-    @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
+//     @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
     private String phoneNumber;
 
     @Schema(description = "Role or position of the board director", example = "Chairman")
