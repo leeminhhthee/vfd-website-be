@@ -58,7 +58,7 @@ public class HeroServiceImpl implements HeroService {
     @Override
     @Transactional
     @CacheEvict(value = "heroes", key = "'all'")
-    @LoggableAction(value =  "CREATE", entity = "heroes", description = "Create new hero")
+    @LoggableAction(value = "CREATE", entity = "heroes", description = "Create new hero")
     public HeroResponseDto createHero(HeroCreateRequestDto dto) {
         Hero hero = Hero.builder()
                 .title(dto.getTitle())
@@ -82,25 +82,29 @@ public class HeroServiceImpl implements HeroService {
     @Transactional
     @CachePut(value = "heroes", key = "#p0")
     @CacheEvict(value = "heroes", key = "'all'")
-    @LoggableAction(value =  "UPDATE", entity = "heroes", description = "Update hero")
+    @LoggableAction(value = "UPDATE", entity = "heroes", description = "Update hero")
     public HeroResponseDto updateHero(Integer id, HeroUpdateRequestDto dto) {
         Hero hero = heroRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hero with id " + id + " not found"));
 
-        if (dto.getTitle() != null)
+        if (dto.getTitle() != null || dto.getTitle() == null)
             hero.setTitle(dto.getTitle());
-        if (dto.getSubTitle() != null)
+        if (dto.getSubTitle() != null || dto.getSubTitle() == null)
             hero.setSubTitle(dto.getSubTitle());
-        if (dto.getImageUrl() != null)
-            hero.setImageUrl(dto.getImageUrl());
-        if (dto.getButtonText() != null)
+        if (dto.getButtonText() != null || dto.getButtonText() == null)
             hero.setButtonText(dto.getButtonText());
-        if (dto.getButtonHref() != null)
+        if (dto.getButtonHref() != null || dto.getButtonHref() == null)
             hero.setButtonHref(dto.getButtonHref());
-        if (dto.getButtonText2() != null)
+        if (dto.getButtonText2() != null || dto.getButtonText2() == null)
             hero.setButtonText2(dto.getButtonText2());
-        if (dto.getButtonHref2() != null)
+        if (dto.getButtonHref2() != null || dto.getButtonHref2() == null)
             hero.setButtonHref2(dto.getButtonHref2());
+        
+        if (dto.getImageUrl() != null) {
+            hero.setImageUrl(dto.getImageUrl());
+        } else {
+            throw new IllegalArgumentException("ImageUrl cannot be null when updating Hero");
+        }
 
         hero = heroRepository.save(hero);
 
@@ -113,7 +117,7 @@ public class HeroServiceImpl implements HeroService {
     @Override
     @Transactional
     @CacheEvict(value = "heroes", allEntries = true)
-    @LoggableAction(value =  "DELETE", entity = "heroes", description = "Delete hero")
+    @LoggableAction(value = "DELETE", entity = "heroes", description = "Delete hero")
     public void deleteHero(Integer id) {
         Hero hero = heroRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hero with id " + id));
