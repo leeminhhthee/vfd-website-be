@@ -54,7 +54,7 @@ public class GalleryServiceImpl implements GalleryService {
     @Cacheable(value = "galleries", key = "#root.args[0]")
     @Transactional(readOnly = true)
     public GalleryResponseDto getGalleryById(Integer id) {
-        return galleryRepository.findById(id)
+        return galleryRepository.findByIdWithTournamentAndImages(id)
                 .map(this::toDto)
                 .orElseThrow(() -> new RuntimeException("Gallery not found with id " + id));
     }
