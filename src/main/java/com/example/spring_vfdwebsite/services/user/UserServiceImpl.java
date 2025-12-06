@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
                 .imageUrl(user.getImageUrl())
                 .hobby(user.getHobby())
                 .isAdmin(user.isAdmin())
+                .isActive(user.isActive())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
@@ -82,6 +83,7 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(createDto.getPhoneNumber())
                 .imageUrl(createDto.getImageUrl())
                 .hobby(createDto.getHobby())
+                .isActive(Boolean.TRUE.equals(createDto.getIsActive()))
                 .build();
 
         // Ensure admin flag is applied explicitly on the entity (avoids builder
@@ -156,6 +158,9 @@ public class UserServiceImpl implements UserService {
             if (!user.isAdmin()) {
                 user.setPassword("");
             }
+        }
+        if (updateDto.getIsActive() != null) {
+            user.setActive(updateDto.getIsActive());
         }
 
         user = userRepository.save(user);

@@ -43,4 +43,8 @@ public class User extends BaseEntity {
     @Builder.Default
     @Column(name = "is_admin", nullable = false)
     private boolean isAdmin = false;
+
+    @Builder.Default
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
 }

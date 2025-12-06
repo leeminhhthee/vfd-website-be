@@ -41,6 +41,10 @@ public class UserCreateRequestDto {
         @Schema(description = "Flag indicating whether the user is an admin", example = "false")
         private Boolean isAdmin = false;
 
+        @Builder.Default
+        @Schema(description = "Flag indicating whether the user is active", example = "true")
+        private Boolean isActive = true;
+
         // Explicit getter to avoid 'is' prefix confusion in
         // serialization/deserialization
         public Boolean getIsAdmin() {

@@ -20,8 +20,8 @@ public class RegisterInitRequestDto {
     @NotBlank(message = "Password is required")
     private String password;
 
-    @AssertTrue(message = "Either username or email is required")
-    public boolean isUsernameOrEmailProvided() {
+    @AssertTrue(message = "Either email is required")
+    public boolean isEmailProvided() {
         return (email != null && !email.isBlank());
     }
 

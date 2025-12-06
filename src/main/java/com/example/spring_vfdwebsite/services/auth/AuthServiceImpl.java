@@ -171,17 +171,18 @@ public class AuthServiceImpl implements AuthService {
                 .phoneNumber(requestDto.getPhoneNumber())
                 .password(passwordEncoder.encode(requestDto.getPassword()))
                 .isAdmin(false)
+                .isActive(true)
                 .build();
         pendingUserRepository.save(pendingUser);
 
         // ===== GHI LOG REGISTER INIT =====
-        ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
-                .actionType("REGISTER_INIT")
-                .targetTable("users")
-                .targetId(null) // Chưa có user ID vì chưa hoàn tất đăng ký
-                .description("User initiated registration")
-                .build();
-        activityLogService.createActivityLogResponseDto(null, logDto);
+        // ActivityLogCreateRequestDto logDto = ActivityLogCreateRequestDto.builder()
+        //         .actionType("REGISTER_INIT")
+        //         .targetTable("users")
+        //         .targetId(null) // Chưa có user ID vì chưa hoàn tất đăng ký
+        //         .description("User initiated registration")
+        //         .build();
+        // activityLogService.createActivityLogResponseDto(null, logDto);
 
         // Gửi OTP đến email
         otpService.sendOtp(requestDto.getEmail(), requestDto.getFullName());

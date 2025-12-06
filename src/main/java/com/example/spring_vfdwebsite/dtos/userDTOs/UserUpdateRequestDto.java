@@ -38,6 +38,9 @@ public class UserUpdateRequestDto {
         @Schema(description = "Flag indicating whether the user is an admin", example = "false")
         private Boolean isAdmin;
 
+        @Schema(description = "Flag indicating whether the user is active", example = "true")
+        private Boolean isActive;
+
         // Explicit getter to provide a stable accessor name and allow null when not
         // updating
         public Boolean getIsAdmin() {

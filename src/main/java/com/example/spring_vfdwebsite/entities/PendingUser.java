@@ -35,6 +35,9 @@ public class PendingUser {
     private boolean isAdmin;
 
     @Column(nullable = false)
+    private boolean isActive;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
