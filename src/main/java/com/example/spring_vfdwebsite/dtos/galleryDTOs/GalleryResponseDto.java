@@ -25,7 +25,7 @@ public class GalleryResponseDto {
     @Schema(description = "Gallery slug", example = "nhan-quyet-dinh-thanh-lap-clb-bong-chuyen-cong-dong")
     private String slug;
 
-    @Schema(description = "Gallery category", example = "other", allowableValues = { "inside", "team", "other" })
+    @Schema(description = "Gallery category", example = "other", allowableValues = { "tournament", "team", "event", "other" })
     private GalleryCategoryEnum category;
 
     @Schema(description = "List of image URLs", example = "[\"https://res.cloudinary.com/.../img1.jpg\", \"https://res.cloudinary.com/.../img2.jpg\"]")

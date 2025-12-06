@@ -28,7 +28,7 @@ public class GalleryUpdateRequestDto {
     @Schema(description = "Gallery slug", example = "giai-bong-chuyen-thanh-pho-2025")
     private String slug;
 
-    @Schema(description = "Gallery category", example = "team", allowableValues = { "inside", "team", "other" })
+    @Schema(description = "Gallery category", example = "team", allowableValues = {"tournament", "team", "event", "other" })
     private GalleryCategoryEnum category;
 
     @Schema(description = "List of image URLs uploaded from frontend", example = "[\"https://res.cloudinary.com/.../img1.jpg\", \"https://res.cloudinary.com/.../img2.jpg\"]")

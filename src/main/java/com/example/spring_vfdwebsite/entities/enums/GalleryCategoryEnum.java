@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum GalleryCategoryEnum {
-    INSIDE("inside"),
+    TOURNAMENT("tournament"),
     TEAM("team"),
+    EVENT("event"),
     OTHER("other");
 
     private final String value;

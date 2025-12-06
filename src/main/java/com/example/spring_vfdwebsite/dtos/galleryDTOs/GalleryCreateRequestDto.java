@@ -29,7 +29,7 @@ public class GalleryCreateRequestDto {
     private String slug;
 
     @NotNull(message = "Category must not be null")
-    @Schema(description = "Gallery category", example = "inside", allowableValues = { "inside", "team", "other" })
+    @Schema(description = "Gallery category", example = "other", allowableValues = { "tournament", "team", "event", "other" })
     private GalleryCategoryEnum category;
 
     @NotNull(message = "Images must not be null")
