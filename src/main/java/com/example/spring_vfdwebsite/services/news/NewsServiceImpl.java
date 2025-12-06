@@ -188,6 +188,16 @@ public class NewsServiceImpl implements NewsService {
         return toDto(news);
     }
 
+    // ===================== Get By Id and Slug =====================
+    @Override
+    @Cacheable(value = "news", key = "'id:' + #root.args[0] + ':slug:' + #root.args[1]")
+    @Transactional(readOnly = true)
+    public NewsResponseDto getNewsByIdSlug(Integer id, String slug) {
+        News news = newsRepository.findByIdAndSlug(id, slug)
+                .orElseThrow(() -> new EntityNotFoundException("News with id " + id + " and slug " + slug + " not found"));
+        return toDto(news);
+    }
+
     // =================== Mapping -> Dto ===================
     private NewsResponseDto toDto(News news) {
         NewsResponseDto.AuthorByDto authorByDto = NewsResponseDto.AuthorByDto.builder()

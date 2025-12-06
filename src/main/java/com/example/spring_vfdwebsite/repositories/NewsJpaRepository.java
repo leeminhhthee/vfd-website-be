@@ -13,4 +13,6 @@ public interface NewsJpaRepository extends JpaRepository<News, Integer> {
 
     boolean existsBySlug(String slug);
 
+    Optional<News> findByIdAndSlug(Integer id, String slug);
+
 }

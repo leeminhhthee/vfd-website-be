@@ -62,6 +62,19 @@ public class NewsController {
                 return ResponseEntity.ok(news);
         }
 
+        // ===================== Get News By Id and Slug =====================
+        @GetMapping("/{id}/{slug}")
+        @Operation(summary = "Get news by ID and Slug", description = "Retrieve news details by ID and Slug", responses = {
+                        @ApiResponse(responseCode = "200", description = "News found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = NewsResponseDto.class))),
+                        @ApiResponse(responseCode = "404", description = "News not found")
+        })
+        public ResponseEntity<NewsResponseDto> getNewsByIdSlug(
+                        @Parameter(description = "ID of the news", required = true) @PathVariable("id") Integer id,
+                        @Parameter(description = "Slug of the news", required = true) @PathVariable("slug") String slug) {
+                NewsResponseDto news = newsService.getNewsByIdSlug(id, slug);
+                return ResponseEntity.ok(news);
+        }
+
         // ===================== Create News =====================
         @PostMapping
         @Operation(summary = "Create new news", description = "Create a new news item with details", responses = {
