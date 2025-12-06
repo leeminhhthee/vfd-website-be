@@ -96,4 +96,17 @@ public class ProjectController {
                 ProjectResponseDto project = projectService.getProjectBySlug(slug);
                 return ResponseEntity.ok(project);
         }
+
+        // ===================== Get By Id and Slug =====================
+        @Operation(summary = "Get project by ID and slug", description = "Retrieve project details by ID and slug", responses = {
+                        @ApiResponse(responseCode = "200", description = "Project found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponseDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Project not found")
+        })
+        @GetMapping("/{id}/{slug}")
+        public ResponseEntity<ProjectResponseDto> getProjectByIdSlug(
+                        @Parameter(description = "ID of the project", required = true) @PathVariable("id") Integer id,
+                        @Parameter(description = "Slug of the project", required = true) @PathVariable("slug") String slug) {
+                ProjectResponseDto project = projectService.getProjectByIdSlug(id, slug);
+                return ResponseEntity.ok(project);
+        }
 }

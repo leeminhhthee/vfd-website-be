@@ -19,5 +19,7 @@ public interface ProjectService {
     void deleteProject(Integer id);
 
     ProjectResponseDto getProjectBySlug(String slug);
+
+    ProjectResponseDto getProjectByIdSlug(Integer id, String slug);
     
 }

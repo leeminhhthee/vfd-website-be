@@ -159,6 +159,16 @@ public class ProjectServiceImpl implements ProjectService {
         return toDto(project);
     }
 
+    // ===================== Get By Id and Slug =====================
+    @Override
+    @Cacheable(value = "projects", key = "#root.args[0] + '-' + #root.args[1]")
+    @Transactional(readOnly = true)
+    public ProjectResponseDto getProjectByIdSlug(Integer id, String slug) {
+        Project project = projectRepository.findByIdAndSlug(id, slug)
+                .orElseThrow(() -> new EntityNotFoundException("Project with id " + id + " and slug " + slug + " not found"));
+        return toDto(project);
+    }
+
     // ===================== Mapper entity -> DTO =====================
     private ProjectResponseDto toDto(Project project) {
         ProjectResponseDto.BankDto bankDto = null;
