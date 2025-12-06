@@ -1,5 +1,7 @@
 package com.example.spring_vfdwebsite.dtos.projectDTOs;
 
+import java.util.List;
+
 import com.example.spring_vfdwebsite.entities.enums.ProjectCategoryEnum;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -46,6 +48,9 @@ public class ProjectUpdateRequestDto {
     @Schema(description = "Updated project category", example = "infrastructure", allowableValues = { "development",
             "infrastructure", "collaboration", "training", "community" })
     private ProjectCategoryEnum category;
+
+    @Schema(description = "Updated goals of the project", example = "[\"Updated Goal 1\", \"Updated Goal 2\"]")
+    private List<String> goals;
 
     @Schema(description = "Updated bank information associated with the project")
     private Integer bankId;

@@ -1,5 +1,8 @@
 package com.example.spring_vfdwebsite.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -58,6 +61,12 @@ public class Project extends BaseEntity {
     @NotNull
     @Column(name = "category", nullable = false)
     private ProjectCategoryEnum category;
+
+    @ElementCollection
+    @CollectionTable(name = "project_goals", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "goal", nullable = false)
+    @Builder.Default
+    private List<String> goals = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

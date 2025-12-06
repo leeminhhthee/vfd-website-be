@@ -1,6 +1,7 @@
 package com.example.spring_vfdwebsite.dtos.projectDTOs;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.spring_vfdwebsite.entities.enums.ProjectCategoryEnum;
 
@@ -46,6 +47,9 @@ public class ProjectResponseDto {
             allowableValues = {"development", "infrastructure", "collaboration", "training", "community"}
     )
     private ProjectCategoryEnum category;
+
+    @Schema(description = "Goals of the project", example = "[\"Goal 1\", \"Goal 2\"]")
+    private List<String> goals;
 
     @Schema(description = "Bank information associated with the project")
     private BankDto bank;

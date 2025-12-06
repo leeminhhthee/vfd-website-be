@@ -43,7 +43,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public List<ProjectResponseDto> getAllProjects() {
         System.out.println("🔥 Fetching all projects from the database...");
-        return projectRepository.findAll()
+        return projectRepository.findAllProject()
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
@@ -54,7 +54,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Cacheable(value = "projects", key = "#root.args[0]")
     @Transactional(readOnly = true)
     public ProjectResponseDto getProjectById(Integer id) {
-        Project project = projectRepository.findById(id)
+        Project project = projectRepository.findByIdProject(id)
                 .orElseThrow(() -> new IllegalArgumentException("Project with id " + id + " not found"));
         return toDto(project);
     }
@@ -80,6 +80,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .price(dto.getPrice())
                 .imageUrl(dto.getImageUrl())
                 .category(dto.getCategory())
+                .goals(dto.getGoals())
                 .bank(bank)
                 .build();
         project = projectRepository.save(project);
@@ -115,6 +116,8 @@ public class ProjectServiceImpl implements ProjectService {
             project.setImageUrl(dto.getImageUrl());
         if (dto.getCategory() != null)
             project.setCategory(dto.getCategory());
+        if (dto.getGoals() != null)
+            project.setGoals(dto.getGoals());
         if (dto.getBankId() != null) {
             Bank bank = bankRepository.findById(dto.getBankId())
                     .orElseThrow(() -> new EntityNotFoundException("Bank with id " + dto.getBankId() + " not found"));
@@ -192,6 +195,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .price(project.getPrice())
                 .imageUrl(project.getImageUrl())
                 .category(project.getCategory())
+                .goals(project.getGoals())
                 .bank(bankDto)
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
