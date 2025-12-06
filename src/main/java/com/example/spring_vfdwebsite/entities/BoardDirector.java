@@ -25,13 +25,11 @@ public class BoardDirector extends BaseEntity {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @NotNull
     @Email
-    @Column(name = "email", nullable = false, length = 50, unique = true)
+    @Column(name = "email", length = 50, unique = true)
     private String email;
 
-    @NotNull
-    @Column(name = "phone_number", nullable = false, length = 10)
+    @Column(name = "phone_number", length = 10)
     @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
     private String phoneNumber;
 

@@ -19,13 +19,11 @@ public class BoardDirectorCreateRequestDto {
     private String fullName;
 
     @Schema(description = "Email address of the board director", example = "nguyenvana@example.com")
-    @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
     @Size(max = 50, message = "Email cannot exceed 50 characters")
     private String email;
 
     @Schema(description = "Phone number of the board director (10 digits)", example = "0912345678")
-    @NotBlank(message = "Phone number is required")
     @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
     private String phoneNumber;
 
