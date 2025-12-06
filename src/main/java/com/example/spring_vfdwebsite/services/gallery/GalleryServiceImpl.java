@@ -43,8 +43,8 @@ public class GalleryServiceImpl implements GalleryService {
     @Transactional(readOnly = true)
     public List<GalleryResponseDto> getAllGalleries() {
         System.out.println("🔥 Fetching all galleries from the database...");
-        return galleryRepository.findAll()
-                .stream()
+        List<Gallery> galleries = galleryRepository.findAllWithTournamentAndImages();
+        return galleries.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
@@ -171,7 +171,8 @@ public class GalleryServiceImpl implements GalleryService {
     @Transactional(readOnly = true)
     public GalleryResponseDto getGalleryByIdSlug(Integer id, String slug) {
         Gallery gallery = galleryRepository.findByIdAndSlug(id, slug)
-                .orElseThrow(() -> new EntityNotFoundException("Gallery not found with id " + id + " and slug " + slug));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Gallery not found with id " + id + " and slug " + slug));
         return toDto(gallery);
     }
 
