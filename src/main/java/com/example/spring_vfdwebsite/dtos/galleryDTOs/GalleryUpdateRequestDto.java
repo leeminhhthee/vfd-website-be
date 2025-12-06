@@ -33,4 +33,7 @@ public class GalleryUpdateRequestDto {
 
     @Schema(description = "List of image URLs uploaded from frontend", example = "[\"https://res.cloudinary.com/.../img1.jpg\", \"https://res.cloudinary.com/.../img2.jpg\"]")
     private List<String> imageUrl;
+
+    @Schema(description = "ID of the tournament this gallery belongs to", example = "1")
+    private Integer tournament;
 }

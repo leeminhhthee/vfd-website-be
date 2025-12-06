@@ -127,6 +127,12 @@ public class GalleryServiceImpl implements GalleryService {
         if (slugMissing || titleChanged) {
             gallery.setSlug(generateUniqueSlug(gallery.getTitle()));
         }
+        if (dto.getTournament() != null) {
+            Tournament tournament = tournamentRepository.findById(dto.getTournament())
+                    .orElseThrow(
+                            () -> new EntityNotFoundException("Tournament not found with id " + dto.getTournament()));
+            gallery.setTournament(tournament);
+        }
 
         Gallery updatedGallery = galleryRepository.save(gallery);
 

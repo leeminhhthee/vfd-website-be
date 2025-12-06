@@ -48,8 +48,8 @@ public class NewsServiceImpl implements NewsService {
     @Transactional(readOnly = true)
     public List<NewsResponseDto> getAllNews() {
         System.out.println("🔥 Fetching all news from the database...");
-        return newsRepository.findAll()
-                .stream()
+        List<News> newsList = newsRepository.findAllNews();
+        return newsList.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
@@ -59,7 +59,7 @@ public class NewsServiceImpl implements NewsService {
     @Cacheable(value = "news", key = "#root.args[0]")
     @Transactional(readOnly = true)
     public NewsResponseDto getNewsById(Integer id) {
-        News news = newsRepository.findById(id)
+        News news = newsRepository.findByIdNews(id)
                 .orElseThrow(() -> new EntityNotFoundException("News with id " + id + " not found"));
         return toDto(news);
     }
@@ -194,7 +194,8 @@ public class NewsServiceImpl implements NewsService {
     @Transactional(readOnly = true)
     public NewsResponseDto getNewsByIdSlug(Integer id, String slug) {
         News news = newsRepository.findByIdAndSlug(id, slug)
-                .orElseThrow(() -> new EntityNotFoundException("News with id " + id + " and slug " + slug + " not found"));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("News with id " + id + " and slug " + slug + " not found"));
         return toDto(news);
     }
 
