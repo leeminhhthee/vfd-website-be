@@ -176,6 +176,7 @@ public class GalleryServiceImpl implements GalleryService {
     }
 
     // ===================== Mapper entity -> DTO =====================
+    @Transactional
     private GalleryResponseDto toDto(Gallery gallery) {
         GalleryResponseDto.TournamentDto tournamentDto = null;
         if (gallery.getTournament() != null) {

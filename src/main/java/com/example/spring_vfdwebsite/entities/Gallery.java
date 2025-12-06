@@ -3,6 +3,7 @@ package com.example.spring_vfdwebsite.entities;
 import java.util.List;
 
 import com.example.spring_vfdwebsite.entities.enums.GalleryCategoryEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
@@ -43,7 +44,8 @@ public class Gallery extends BaseEntity {
     @JsonProperty("images")
     private List<String> imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "tournament_id", nullable = true)
+    @JsonIgnore
     private Tournament tournament;
 }
