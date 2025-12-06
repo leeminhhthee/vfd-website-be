@@ -2,6 +2,7 @@ package com.example.spring_vfdwebsite.services.tournament;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
@@ -80,14 +81,13 @@ public class TournamentServiceImpl implements TournamentService {
         if (dto.getRelatedDocumentIds() != null && !dto.getRelatedDocumentIds().isEmpty()) {
             List<Document> documents = documentRepository.findAllById(dto.getRelatedDocumentIds());
 
-            List<TournamentDocument> tournamentDocuments = documents.stream()
+            Set<TournamentDocument> tournamentDocuments = documents.stream()
                     .map(doc -> TournamentDocument.builder()
                             .id(new TournamentDocumentId(tournament.getId(), doc.getId()))
                             .tournament(tournament)
                             .document(doc)
                             .build())
-                    .toList();
-
+                    .collect(Collectors.toSet());
             tournament.setTournamentDocuments(tournamentDocuments);
             // Lưu lại để update liên kết pivot
             tournamentRepository.save(tournament);
@@ -172,7 +172,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Cacheable(value = "tournaments", key = "#root.args[0]")
     @Transactional(readOnly = true)
     public TournamentResponseDto getTournamentById(Integer tournamentId) {
-        Tournament tournament = tournamentRepository.findById(tournamentId)
+        Tournament tournament = tournamentRepository.findByIdTournament(tournamentId)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id: " + tournamentId));
         return toDto(tournament);
     }
@@ -183,7 +183,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Transactional(readOnly = true)
     public List<TournamentResponseDto> getAllTournaments() {
         System.out.println("🔥 Fetching all tournaments from the database...");
-        List<Tournament> tournaments = tournamentRepository.findAll();
+        List<Tournament> tournaments = tournamentRepository.findAllTournament();
         return tournaments.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
@@ -217,7 +217,8 @@ public class TournamentServiceImpl implements TournamentService {
     @Transactional(readOnly = true)
     public TournamentResponseDto getTournamentByIdSlug(Integer id, String slug) {
         Tournament tournament = tournamentRepository.findByIdAndSlug(id, slug)
-                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with id " + id + " and slug " + slug));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Tournament not found with id " + id + " and slug " + slug));
         return toDto(tournament);
     }
 

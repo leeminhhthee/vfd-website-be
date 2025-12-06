@@ -2,7 +2,9 @@ package com.example.spring_vfdwebsite.entities;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -71,15 +73,25 @@ public class Tournament extends BaseEntity {
     @Column(name = "image_url")
     private List<String> scheduleImages;
 
-    @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    @Builder.Default
-    private List<TournamentDocument> tournamentDocuments = new ArrayList<>();
+    // @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    // @JsonIgnore
+    // @Builder.Default
+    // private List<TournamentDocument> tournamentDocuments = new ArrayList<>();
+
+    // @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    // @JsonIgnore
+    // @Builder.Default
+    // private List<MatchSchedule> matchSchedules = new ArrayList<>();
 
     @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @Builder.Default
-    private List<MatchSchedule> matchSchedules = new ArrayList<>();
+    private Set<TournamentDocument> tournamentDocuments = new HashSet<>();
+
+    @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
+    private Set<MatchSchedule> matchSchedules = new HashSet<>();
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
