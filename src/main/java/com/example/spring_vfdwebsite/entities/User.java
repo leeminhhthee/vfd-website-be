@@ -2,6 +2,10 @@ package com.example.spring_vfdwebsite.entities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -74,4 +78,15 @@ public class User extends BaseEntity {
         super.onCreate();
         this.joinedAt = LocalDateTime.now();
     }
+
+    // Mối quan hệ với RefreshToken (Giải quyết Lỗi 1)
+    // mappedBy = "user": Trỏ đến trường 'user' trong Entity RefreshToken
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) 
+    @OnDelete(action = OnDeleteAction.CASCADE) 
+    private Set<RefreshToken> refreshTokens; 
+
+    // Mối quan hệ với ActivityLog (Giải quyết Lỗi 2)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) 
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<ActivityLog> activityLogs; 
 }

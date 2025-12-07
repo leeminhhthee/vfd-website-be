@@ -11,6 +11,8 @@ import com.example.spring_vfdwebsite.events.users.UserUpdatedEvent;
 import com.example.spring_vfdwebsite.exceptions.EntityDuplicateException;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
 import com.example.spring_vfdwebsite.exceptions.HttpException;
+import com.example.spring_vfdwebsite.repositories.ActivityLogJpaRepository;
+import com.example.spring_vfdwebsite.repositories.RefreshTokenRepository;
 import com.example.spring_vfdwebsite.repositories.UserJpaRepository;
 import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
 
@@ -36,6 +38,8 @@ public class UserServiceImpl implements UserService {
     private final UserJpaRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CloudinaryUtils cloudinaryUtils;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final ActivityLogJpaRepository activityLogRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     // Convert entity to DTO
@@ -63,7 +67,7 @@ public class UserServiceImpl implements UserService {
     // Create new user
     @Override
     @CacheEvict(value = "users", allEntries = true)
-    @LoggableAction(value =  "CREATE", entity = "users", description = "Create a new user")
+    @LoggableAction(value = "CREATE", entity = "users", description = "Create a new user")
     public UserResponseDto createUser(UserCreateRequestDto createDto) {
 
         // Check email uniqueness
@@ -137,7 +141,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @CachePut(value = "users", key = "#p0")
     @CacheEvict(value = "users", key = "'all'")
-    @LoggableAction(value =  "UPDATE", entity = "users", description = "Update an existing user")
+    @LoggableAction(value = "UPDATE", entity = "users", description = "Update an existing user")
     public UserResponseDto updateUser(Integer id, UserUpdateRequestDto updateDto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
@@ -191,7 +195,7 @@ public class UserServiceImpl implements UserService {
     // Delete user
     @Override
     @CacheEvict(value = "users", allEntries = true)
-    @LoggableAction(value =  "DELETE", entity = "users", description = "Delete an existing user")
+    @LoggableAction(value = "DELETE", entity = "users", description = "Delete an existing user")
     public void deleteUser(Integer id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + id));
@@ -199,6 +203,9 @@ public class UserServiceImpl implements UserService {
         if (user.getImageUrl() != null) {
             cloudinaryUtils.deleteFile(user.getImageUrl());
         }
+
+        activityLogRepository.deleteByUserId(id); 
+        refreshTokenRepository.deleteByUserId(id);
         userRepository.deleteById(id);
 
         // Phát sự kiện UserDeletedEvent

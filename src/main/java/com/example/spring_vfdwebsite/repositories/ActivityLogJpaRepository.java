@@ -15,4 +15,6 @@ public interface ActivityLogJpaRepository extends JpaRepository<ActivityLog, Int
     
     List<ActivityLog> findByUserId(Integer userId);
     List<ActivityLog> findByActionType(String actionType);
+
+    void deleteByUserId(Integer userId);
 }
