@@ -58,7 +58,6 @@ public class UserServiceTest {
         mockUser.setFullName("Test User");
         mockUser.setEmail("testuser@example.com");
         mockUser.setPhoneNumber("0912345645");
-        mockUser.setHobby("Volleyball, Reading");
         mockUser.setPassword("password123");
         mockUser.setAdmin(true);
         mockUser.setActive(true);
@@ -116,7 +115,6 @@ public class UserServiceTest {
         dto.setFullName("Test User");
         dto.setEmail("testuser@example.com");
         dto.setPhoneNumber("0912345645");
-        dto.setHobby("Volleyball");
         dto.setIsAdmin(true);
         dto.setIsActive(true);
         dto.setPassword("admin123");
@@ -206,7 +204,6 @@ public class UserServiceTest {
         dto.setFullName("Updated Name");
         dto.setEmail("updated@example.com");
         dto.setPhoneNumber("0999999999");
-        dto.setHobby("Football");
         dto.setIsAdmin(true);
         dto.setIsActive(false);
 
@@ -219,7 +216,6 @@ public class UserServiceTest {
         assertEquals("Updated Name", result.getFullName());
         assertEquals("updated@example.com", result.getEmail());
         assertEquals("0999999999", result.getPhoneNumber());
-        assertEquals("Football", result.getHobby());
         assertTrue(result.getIsAdmin());
         assertFalse(result.getIsActive());
 

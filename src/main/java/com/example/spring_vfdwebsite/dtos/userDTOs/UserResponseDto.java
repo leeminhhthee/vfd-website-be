@@ -3,6 +3,7 @@ package com.example.spring_vfdwebsite.dtos.userDTOs;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Schema(description = "DTO for User response")
@@ -26,11 +27,29 @@ public class UserResponseDto {
         @Schema(description = "Phone number of the user", example = "0912345678")
         private String phoneNumber;
 
+        @Schema(description = "Birthday of the user", example = "1992-08-15")
+        private LocalDate birthday;
+
+        @Schema(description = "Gender of the user", example = "Male")
+        private String gender;
+
+        @Schema(description = "Address of the user", example = "456 Another St, City, Country")
+        private String address;
+
+        @Schema(description = "Level of the user", example = "university")
+        private String level;
+
+        @Schema(description = "Education background of the user", example = "Bachelor's Degree in Information Technology")
+        private String education;
+
+        @Schema(description = "Accumulated points of the user", example = "1500")
+        private Integer accumulatedPoints;
+
+        @Schema(description = "Timestamp when the user joined", example = "2025-01-15T10:30:00")
+        private LocalDateTime joinedAt;
+
         @Schema(description = "URL to the user's profile image", example = "https://example.com/images/user1.png")
         private String imageUrl;
-
-        @Schema(description = "User's hobbies or interests", example = "Reading, Volleyball, Traveling")
-        private String hobby;
 
         @Schema(description = "Flag indicating whether the user is an admin", example = "false")
         private Boolean isAdmin;

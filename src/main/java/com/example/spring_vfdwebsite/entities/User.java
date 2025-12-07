@@ -1,5 +1,8 @@
 package com.example.spring_vfdwebsite.entities;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -30,12 +33,30 @@ public class User extends BaseEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "birthday")
+    private LocalDate birthday;
+
+    @Column(name = "gender")
+    private String gender;
+
+    @Column(name = "address", length = 255)
+    private String address;
+
+    @Column(name = "level")
+    private String level;
+
+    @Column(name = "education")
+    private String education;
+
+    @Column(name = "accumulated_points")
+    private Integer accumulatedPoints;
+
+    @Column(name = "joined_at")
+    private LocalDateTime joinedAt;
+
     @Size(max = 500)
     @Column(name = "image_url", length = 500)
     private String imageUrl;
-
-    @Column(columnDefinition = "TEXT")
-    private String hobby;
 
     @Column(nullable = true)
     private String password;
@@ -47,4 +68,10 @@ public class User extends BaseEntity {
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
+
+    @PrePersist
+    protected void onCreate() {
+        super.onCreate();
+        this.joinedAt = LocalDateTime.now();
+    }
 }

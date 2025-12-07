@@ -16,7 +16,6 @@ import com.example.spring_vfdwebsite.utils.CloudinaryUtils;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,8 +45,14 @@ public class UserServiceImpl implements UserService {
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
+                .birthday(user.getBirthday())
+                .gender(user.getGender())
+                .address(user.getAddress())
+                .level(user.getLevel())
+                .education(user.getEducation())
+                .accumulatedPoints(user.getAccumulatedPoints())
+                .joinedAt(user.getJoinedAt())
                 .imageUrl(user.getImageUrl())
-                .hobby(user.getHobby())
                 .isAdmin(user.isAdmin())
                 .isActive(user.isActive())
                 .createdAt(user.getCreatedAt())
@@ -80,7 +85,12 @@ public class UserServiceImpl implements UserService {
                 .email(createDto.getEmail())
                 .phoneNumber(createDto.getPhoneNumber())
                 .imageUrl(createDto.getImageUrl())
-                .hobby(createDto.getHobby())
+                .birthday(createDto.getBirthday())
+                .gender(createDto.getGender())
+                .address(createDto.getAddress())
+                .level(createDto.getLevel())
+                .education(createDto.getEducation())
+                .accumulatedPoints(createDto.getAccumulatedPoints())
                 .isActive(Boolean.TRUE.equals(createDto.getIsActive()))
                 .build();
 
@@ -143,12 +153,22 @@ public class UserServiceImpl implements UserService {
             user.setFullName(updateDto.getFullName());
         if (updateDto.getPhoneNumber() != null)
             user.setPhoneNumber(updateDto.getPhoneNumber());
+        if (updateDto.getBirthday() != null)
+            user.setBirthday(updateDto.getBirthday());
+        if (updateDto.getGender() != null)
+            user.setGender(updateDto.getGender());
+        if (updateDto.getAddress() != null)
+            user.setAddress(updateDto.getAddress());
+        if (updateDto.getLevel() != null)
+            user.setLevel(updateDto.getLevel());
+        if (updateDto.getEducation() != null)
+            user.setEducation(updateDto.getEducation());
+        if (updateDto.getAccumulatedPoints() != null)
+            user.setAccumulatedPoints(updateDto.getAccumulatedPoints());
         if (updateDto.getImageUrl() != null)
             user.setImageUrl(updateDto.getImageUrl());
-        if (updateDto.getHobby() != null)
-            user.setHobby(updateDto.getHobby());
         if (updateDto.getPassword() != null)
-            user.setPassword(updateDto.getPassword());
+            user.setPassword(passwordEncoder.encode(updateDto.getPassword()));
         if (updateDto.getIsAdmin() != null) {
             user.setAdmin(updateDto.getIsAdmin());
             // If user is downgraded to non-admin, clear password to align with member

@@ -1,5 +1,7 @@
 package com.example.spring_vfdwebsite.dtos.userDTOs;
 
+import java.time.LocalDate;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -29,8 +31,23 @@ public class UserUpdateRequestDto {
         @Schema(description = "URL to the user's profile image", example = "https://example.com/images/user1.png")
         private String imageUrl;
 
-        @Schema(description = "User's hobbies or interests", example = "Reading, Volleyball, Traveling")
-        private String hobby;
+        @Schema(description = "Birthday of the user", example = "1992-08-15")
+        private LocalDate birthday;
+
+        @Schema(description = "Gender of the user", example = "Male")
+        private String gender;
+
+        @Schema(description = "Address of the user", example = "456 Another St, City, Country")
+        private String address;
+
+        @Schema(description = "Level of the user", example = "university")
+        private String level;
+
+        @Schema(description = "Education background of the user", example = "Bachelor's Degree in Information Technology")
+        private String education;
+
+        @Schema(description = "Accumulated points of the user", example = "1500")
+        private Integer accumulatedPoints;
 
         @Schema(description = "Password of the user (optional, only if being updated)", example = "newpassword123")
         private String password;
