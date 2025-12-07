@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.spring_vfdwebsite.dtos.activityLogDTOs.ActivityLogCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.activityLogDTOs.ActivityLogResponseDto;
+import com.example.spring_vfdwebsite.dtos.activityLogDTOs.PaginatedAcivityLogResponseDto;
 import com.example.spring_vfdwebsite.entities.User;
 
 public interface ActivityLogService {
@@ -14,5 +15,8 @@ public interface ActivityLogService {
     void deleteActivityLog(List<Integer> ids);
 
     List<String> getActionTypes();
+
+    // Paginated Activity Logs
+    PaginatedAcivityLogResponseDto getPaginatedActivityLogs(int pageNumber, int pageSize);
 
 }

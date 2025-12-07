@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(name = "Activity Log Controller", description = "API endpoint for managing activity logs")
 public class ActivityLogController {
-    
+
     private final ActivityLogService activityLogService;
     private final UserJpaRepository userRepository;
 
@@ -43,6 +43,22 @@ public class ActivityLogController {
         return ResponseEntity.ok(activityLogs);
     }
 
+    // ==================== Get Paginated Activity Logs =====================
+    @Operation(summary = "Get paginated activity logs", description = "Retrieve a paginated list of activity logs", responses = {
+            @ApiResponse(responseCode = "200", description = "Paginated activity logs retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaginatedAcivityLogResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid pagination parameters"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/paginated")
+    public ResponseEntity<PaginatedAcivityLogResponseDto> getPaginatedActivityLogs(
+            @Parameter(description = "Page number (1-based)", example = "1") @RequestParam(defaultValue = "1") int pageNumber,
+            @Parameter(description = "Number of items per page", example = "10") @RequestParam(defaultValue = "10") int pageSize) {
+        int actualPageNumber = Math.max(1, pageNumber);
+        PaginatedAcivityLogResponseDto paginatedActivityLogs = activityLogService.getPaginatedActivityLogs(actualPageNumber - 1,
+                pageSize);
+        return ResponseEntity.ok(paginatedActivityLogs);
+    }
+
     // ==================== Create Activity Log =====================
     @Operation(summary = "Create a new activity log", description = "Create a new activity log with the provided details", responses = {
             @ApiResponse(responseCode = "201", description = "Activity log created successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ActivityLogResponseDto.class))),
@@ -50,7 +66,8 @@ public class ActivityLogController {
             @ApiResponse(responseCode = "401", description = "User not authenticated")
     })
     @PostMapping
-    public ResponseEntity<ActivityLogResponseDto> createActivityLog(@Valid @RequestBody ActivityLogCreateRequestDto dto) {
+    public ResponseEntity<ActivityLogResponseDto> createActivityLog(
+            @Valid @RequestBody ActivityLogCreateRequestDto dto) {
         User currentUser = getCurrentAuthenticatedUser();
         ActivityLogResponseDto createdActivityLog = activityLogService.createActivityLogResponseDto(currentUser, dto);
         return ResponseEntity.status(201).body(createdActivityLog);
@@ -62,7 +79,8 @@ public class ActivityLogController {
             @ApiResponse(responseCode = "404", description = "Activity log not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteActivityLog(@Parameter(description = "ID of the activity log to delete") @PathVariable("id") Integer id) {
+    public ResponseEntity<Void> deleteActivityLog(
+            @Parameter(description = "ID of the activity log to delete") @PathVariable("id") Integer id) {
         activityLogService.deleteActivityLog(List.of(id));
         return ResponseEntity.noContent().build();
     }
@@ -73,7 +91,8 @@ public class ActivityLogController {
             @ApiResponse(responseCode = "404", description = "One or more activity logs not found")
     })
     @DeleteMapping
-    public ResponseEntity<Void> deleteActivityLogs(@Parameter(description = "IDs of the activity logs to delete") @RequestBody List<Integer> ids) {
+    public ResponseEntity<Void> deleteActivityLogs(
+            @Parameter(description = "IDs of the activity logs to delete") @RequestBody List<Integer> ids) {
         activityLogService.deleteActivityLog(ids);
         return ResponseEntity.noContent().build();
     }
@@ -89,10 +108,11 @@ public class ActivityLogController {
         return ResponseEntity.ok(actionTypes);
     }
 
-     // ==================== Utility method =====================
+    // ==================== Utility method =====================
     private User getCurrentAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new SecurityException("User is not authenticated");
         }
         Object principal = authentication.getPrincipal();

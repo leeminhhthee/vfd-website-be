@@ -5,11 +5,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.spring_vfdwebsite.dtos.activityLogDTOs.ActivityLogCreateRequestDto;
 import com.example.spring_vfdwebsite.dtos.activityLogDTOs.ActivityLogResponseDto;
+import com.example.spring_vfdwebsite.dtos.activityLogDTOs.PaginatedAcivityLogResponseDto;
 import com.example.spring_vfdwebsite.entities.ActivityLog;
 import com.example.spring_vfdwebsite.entities.User;
 import com.example.spring_vfdwebsite.exceptions.EntityNotFoundException;
@@ -32,6 +37,36 @@ public class ActivityLogServiceImpl implements ActivityLogService {
         return activityLogs.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    // Paginated Activity Logs
+    @Override
+    @Cacheable(value = "activity-logs", key = "'paginated-' + #pageNumber + '-' + #pageSize")
+    @Transactional(readOnly = true)
+    public PaginatedAcivityLogResponseDto getPaginatedActivityLogs(int pageNumber, int pageSize) {
+
+        Sort sort = Sort.by("createdAt").descending();
+        // Tạo Pageable object với page và size
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        // Lấy dữ liệu phân trang từ repository
+        Page<ActivityLog> activityLogPage = this.activityLogRepository.findAll(pageable);
+
+        // Chuyển đổi Page<Student> thành List<StudentResponseDto>
+        List<ActivityLogResponseDto> activityLogDtos = activityLogPage.getContent().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+
+        // Tạo response DTO với thông tin phân trang
+        return PaginatedAcivityLogResponseDto.builder()
+                .data(activityLogDtos)
+                .pageNumber(activityLogPage.getNumber())
+                .pageSize(activityLogPage.getSize())
+                .totalRecords(activityLogPage.getTotalElements())
+                .totalPages(activityLogPage.getTotalPages())
+                .hasNext(activityLogPage.hasNext())
+                .hasPrevious(activityLogPage.hasPrevious())
+                .build();
     }
 
     // Tạo log mới từ
