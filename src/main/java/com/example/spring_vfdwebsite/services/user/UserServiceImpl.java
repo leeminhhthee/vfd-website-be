@@ -37,8 +37,6 @@ public class UserServiceImpl implements UserService {
     private final UserJpaRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CloudinaryUtils cloudinaryUtils;
-
-    @Autowired
     private final ApplicationEventPublisher eventPublisher;
 
     // Convert entity to DTO
