@@ -190,7 +190,7 @@ public class UserServiceImpl implements UserService {
 
     // Delete user
     @Override
-    @CacheEvict(value = "users", key = "#id")
+    @CacheEvict(value = "partners", allEntries = true)
     @LoggableAction(value =  "DELETE", entity = "users", description = "Delete an existing user")
     public void deleteUser(Integer id) {
         User user = userRepository.findById(id)
