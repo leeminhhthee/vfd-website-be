@@ -46,7 +46,7 @@ public class TournamentServiceImpl implements TournamentService {
     // ===================== Create =====================
     @Override
     @Transactional
-    @CacheEvict(value = "tournaments", allEntries = true)
+    @CacheEvict(value = {"tournaments", "galleries", "registration-forms"}, allEntries = true)
     @LoggableAction(value = "CREATE", entity = "tournaments", description = "Create a new tournament")
     public TournamentResponseDto createTournament(TournamentCreateRequestDto dto) {
 
@@ -102,7 +102,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     @CachePut(value = "tournaments", key = "#p0")
-    @CacheEvict(value = "tournaments", key = "'all'")
+    @CacheEvict(value = {"tournaments", "galleries", "registration-forms"}, allEntries = true)
     @LoggableAction(value = "UPDATE", entity = "tournaments", description = "Update an existing tournament")
     public TournamentResponseDto updateTournament(Integer tournamentId, TournamentUpdateRequestDto dto) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
@@ -192,7 +192,7 @@ public class TournamentServiceImpl implements TournamentService {
     // ===================== Delete =====================
     @Override
     @Transactional
-    @CacheEvict(value = "tournaments", key = "'all'")
+    @CacheEvict(value = {"tournaments", "galleries", "registration-forms"}, allEntries = true)
     @LoggableAction(value = "DELETE", entity = "tournaments", description = "Delete an existing tournament")
     public void deleteTournament(Integer tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)

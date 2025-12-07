@@ -62,7 +62,7 @@ public class DocumentServiceImpl implements DocumentService {
     // ===================== Create =====================
     @Override
     @Transactional
-    @CacheEvict(value = "documents", allEntries = true)
+    @CacheEvict(value = {"documents", "users", "tournaments"}, allEntries = true)
     @LoggableAction(value =  "CREATE", entity = "documents", description = "Create document")
     public DocumentResponseDto createDocument(DocumentCreateRequestDto dto) {
 
@@ -113,7 +113,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     @CachePut(value = "documents", key = "#p0")
-    @CacheEvict(value = "documents", key = "'all'")
+    @CacheEvict(value = {"documents", "users", "tournaments"}, allEntries = true)
     @LoggableAction(value =  "UPDATE", entity = "documents", description = "Update document")
     public DocumentResponseDto updateDocument(Integer id, DocumentUpdateRequestDto dto) {
         Document document = documentRepository.findById(id)
@@ -166,7 +166,7 @@ public class DocumentServiceImpl implements DocumentService {
     // ===================== Delete =====================
     @Override
     @Transactional
-    @CacheEvict(value = "documents", key = "'all'")
+    @CacheEvict(value = {"documents", "users", "tournaments"}, allEntries = true)
     @LoggableAction(value =  "DELETE", entity = "documents", description = "Delete document")
     public void deleteDocument(Integer id) {
         Document document = documentRepository.findById(id)

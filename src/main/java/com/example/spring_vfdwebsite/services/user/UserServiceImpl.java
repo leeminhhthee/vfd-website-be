@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
 
     // Create new user
     @Override
-    @CacheEvict(value = "users", allEntries = true)
+    @CacheEvict(value = {"users", "news"}, allEntries = true)
     @LoggableAction(value = "CREATE", entity = "users", description = "Create a new user")
     public UserResponseDto createUser(UserCreateRequestDto createDto) {
 
@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
     // Update user
     @Override
     @CachePut(value = "users", key = "#p0")
-    @CacheEvict(value = "users", key = "'all'")
+    @CacheEvict(value = {"users", "news"}, allEntries = true)
     @LoggableAction(value = "UPDATE", entity = "users", description = "Update an existing user")
     public UserResponseDto updateUser(Integer id, UserUpdateRequestDto updateDto) {
         User user = userRepository.findById(id)
@@ -194,7 +194,7 @@ public class UserServiceImpl implements UserService {
 
     // Delete user
     @Override
-    @CacheEvict(value = "users", allEntries = true)
+    @CacheEvict(value = {"users", "news"}, allEntries = true)
     @LoggableAction(value = "DELETE", entity = "users", description = "Delete an existing user")
     public void deleteUser(Integer id) {
         User user = userRepository.findById(id)

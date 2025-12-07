@@ -131,7 +131,7 @@ public class MatchScheduleDraftServiceImpl implements MatchScheduleDraftService 
     // ==================== Approve Drafts =====================
     @Override
     @Transactional
-    @CacheEvict(value = "match-schedule-drafts", allEntries = true)
+    @CacheEvict(value = {"match-schedule-drafts", "tournaments", "match-schedules"}, allEntries = true)
     @LoggableAction(value =  "APPROVE_DRAFTS", entity = "match-schedule-drafts", description = "Approve match schedule drafts and create official matches")
     public void approveDrafts(ApproveDraftsRequestDto dto) {
         List<Integer> ids = dto.getId();

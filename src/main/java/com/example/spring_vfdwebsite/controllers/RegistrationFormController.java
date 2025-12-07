@@ -98,4 +98,17 @@ public class RegistrationFormController {
                 List<RegistrationFormResponseDto> list = registrationFormService.getAllRegistrationForms();
                 return ResponseEntity.ok(list);
         }
+
+        // ======== Get Registration Forms By Tournament Id Status Accepted  ================
+        @Operation(summary = "Get accepted registration forms by tournament ID", description = "Retrieve a list of accepted registration forms for a specific tournament", responses = {
+                        @ApiResponse(responseCode = "200", description = "List of accepted registration forms", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeamRegistrationDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Tournament not found")
+        })
+        @GetMapping("/tournaments/{tournamentId}/registrations/accepted")
+        public ResponseEntity<List<TeamRegistrationDto>> getAcceptedRegistrationFormsByTournamentId(
+                        @Parameter(description = "ID of the tournament", required = true) @PathVariable("tournamentId") Integer tournamentId) {
+                List<TeamRegistrationDto> list = registrationFormService
+                                .getRegistrationFormsByTournamentId(tournamentId);
+                return ResponseEntity.ok(list);
+        }
 }

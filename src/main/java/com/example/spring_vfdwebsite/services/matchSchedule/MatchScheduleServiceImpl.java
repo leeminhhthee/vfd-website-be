@@ -36,7 +36,7 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
     // ===================== Create =====================
     @Override
     @Transactional
-    @CacheEvict(value = "match-schedules", key = "'all'")
+    @CacheEvict(value = { "match-schedules", "tournaments" }, allEntries = true)
     @LoggableAction(value =  "CREATE", entity = "match-schedules", description = "Create a new match schedule")
     public MatchScheduleResponseDto createMatchSchedule(MatchScheduleCreateRequestDto dto) {
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
@@ -65,7 +65,7 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
     @Override
     @Transactional
     @CachePut(value = "match-schedules", key = "#p0")
-    @CacheEvict(value = "match-schedules", key = "'all'")
+    @CacheEvict(value = { "match-schedules", "tournaments" }, allEntries = true)
     @LoggableAction(value =  "UPDATE", entity = "match-schedules", description = "Update an existing match schedule")
     public MatchScheduleResponseDto updateMatchSchedule(Integer id, MatchScheduleUpdateRequestDto dto) {
         MatchSchedule matchSchedule = matchScheduleRepository.findById(id)
@@ -125,7 +125,7 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
     // ===================== Delete =====================
     @Override
     @Transactional
-    @CacheEvict(value = "match-schedules", key = "'all'")
+    @CacheEvict(value = { "match-schedules", "tournaments" }, allEntries = true)
     @LoggableAction(value =  "DELETE", entity = "match-schedules", description = "Delete an existing match schedule")
     public void deleteMatchSchedule(Integer id) {
         MatchSchedule matchSchedule = matchScheduleRepository.findById(id)

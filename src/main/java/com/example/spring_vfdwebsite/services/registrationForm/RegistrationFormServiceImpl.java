@@ -68,7 +68,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
     @Override
     @Transactional
     @CacheEvict(value = "registration-forms", allEntries = true)
-    @LoggableAction(value =  "CREATE", entity = "registration-forms", description = "Create a new registration form")
+    @LoggableAction(value = "CREATE", entity = "registration-forms", description = "Create a new registration form")
     public RegistrationFormResponseDto createRegistrationForm(RegistrationFormCreateRequestDto dto) {
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -116,7 +116,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
     @Transactional
     @CachePut(value = "registration-forms", key = "#p0")
     @CacheEvict(value = "registration-forms", key = "'all'")
-    @LoggableAction(value =  "UPDATE", entity = "registration-forms", description = "Update an existing registration form")
+    @LoggableAction(value = "UPDATE", entity = "registration-forms", description = "Update an existing registration form")
     public RegistrationFormResponseDto updateRegistrationForm(Integer id, RegistrationFormUpdateRequestDto dto) {
         RegistrationForm form = registrationFormRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("RegistrationForm with id " + id + " not found"));
@@ -166,7 +166,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
     @Override
     @Transactional
     @CacheEvict(value = "registration-forms", allEntries = true)
-    @LoggableAction(value =  "DELETE", entity = "registration-forms", description = "Delete an existing registration form")
+    @LoggableAction(value = "DELETE", entity = "registration-forms", description = "Delete an existing registration form")
     public void deleteRegistrationForm(Integer id) {
         RegistrationForm form = registrationFormRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Registration Form with id " + id + " not found"));
@@ -185,7 +185,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
     @Transactional
     @CacheEvict(value = "registration-forms", key = "'all'")
     @CachePut(value = "registration-forms", key = "#p0")
-    @LoggableAction(value =  "CHANGE_STATUS", entity = "registration-forms", description = "Change registration form status")
+    @LoggableAction(value = "CHANGE_STATUS", entity = "registration-forms", description = "Change registration form status")
     public RegistrationFormResponseDto changeRegistrationFormStatus(Integer id, RegistrationFormRequestDto dto) {
         RegistrationForm form = registrationFormRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("RegistrationForm with id " + id + " not found"));
@@ -238,6 +238,13 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
         eventPublisher.publishEvent(new RegistrationFormUpdatedEvent(form.getId(), form));
 
         return toDto(form);
+    }
+
+    // =================== Get Registration Forms By Tournament Id ===================
+    @Override
+    @Transactional(readOnly = true)
+    public List<TeamRegistrationDto> getRegistrationFormsByTournamentId(Integer tournamentId) {
+        return registrationFormRepository.findAcceptedTeamsDto(tournamentId);
     }
 
     // =================== Mapping -> Dto ===================

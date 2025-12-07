@@ -72,12 +72,14 @@ public class Tournament extends BaseEntity {
     @Column(name = "image_url")
     private List<String> scheduleImages;
 
-    // @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    // @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade =
+    // CascadeType.ALL, orphanRemoval = true)
     // @JsonIgnore
     // @Builder.Default
     // private List<TournamentDocument> tournamentDocuments = new ArrayList<>();
 
-    // @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    // @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade =
+    // CascadeType.ALL, orphanRemoval = true)
     // @JsonIgnore
     // @Builder.Default
     // private List<MatchSchedule> matchSchedules = new ArrayList<>();
@@ -97,5 +99,8 @@ public class Tournament extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
+
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RegistrationForm> registrationForms;
 
 }
