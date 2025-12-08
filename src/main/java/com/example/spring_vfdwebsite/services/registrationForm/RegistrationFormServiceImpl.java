@@ -44,7 +44,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
 
     // ===================== Get all =====================
     @Override
-    @Cacheable(value = {"registration-forms", "tournaments"}, key = "'all'")
+    @Cacheable(value = "registration-forms", key = "'all'")
     @Transactional(readOnly = true)
     public List<RegistrationFormResponseDto> getAllRegistrationForms() {
         System.out.println("🔥 Fetching all registration forms from the database...");
@@ -56,7 +56,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
 
     // ===================== Get By Id =====================
     @Override
-    @Cacheable(value = {"registration-forms", "tournaments"}, key = "#root.args[0]")
+    @Cacheable(value = "registration-forms", key = "#root.args[0]")
     @Transactional(readOnly = true)
     public RegistrationFormResponseDto getRegistrationFormById(Integer id) {
         RegistrationForm form = registrationFormRepository.findById(id)
