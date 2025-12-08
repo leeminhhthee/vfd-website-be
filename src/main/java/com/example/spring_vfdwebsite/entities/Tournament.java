@@ -72,18 +72,6 @@ public class Tournament extends BaseEntity {
     @Column(name = "image_url")
     private List<String> scheduleImages;
 
-    // @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade =
-    // CascadeType.ALL, orphanRemoval = true)
-    // @JsonIgnore
-    // @Builder.Default
-    // private List<TournamentDocument> tournamentDocuments = new ArrayList<>();
-
-    // @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade =
-    // CascadeType.ALL, orphanRemoval = true)
-    // @JsonIgnore
-    // @Builder.Default
-    // private List<MatchSchedule> matchSchedules = new ArrayList<>();
-
     @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @Builder.Default
@@ -104,5 +92,10 @@ public class Tournament extends BaseEntity {
     @JsonIgnore
     @Builder.Default
     private Set<RegistrationForm> registrationForms = new HashSet<>();
+
+    @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY)
+    @JsonIgnore
+    @Builder.Default
+    private Set<Gallery> galleries = new HashSet<>();
 
 }
