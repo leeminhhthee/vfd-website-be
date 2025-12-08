@@ -12,6 +12,9 @@ import com.example.spring_vfdwebsite.entities.RegistrationForm;
 
 @Repository
 public interface RegistrationFormJpaRepository extends JpaRepository<RegistrationForm, Integer> {
+
+    boolean existsByTournament_IdAndEmail(Integer tournamentId, String email);
+
     @Query("""
                 SELECT new com.example.spring_vfdwebsite.dtos.registrationFormDTOs.TeamRegistrationDto(
                     r.id,

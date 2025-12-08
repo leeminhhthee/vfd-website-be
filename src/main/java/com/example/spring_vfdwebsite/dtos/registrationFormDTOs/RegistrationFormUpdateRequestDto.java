@@ -1,7 +1,5 @@
 package com.example.spring_vfdwebsite.dtos.registrationFormDTOs;
 
-import java.time.LocalDate;
-
 import com.example.spring_vfdwebsite.entities.enums.RegistrationStatusEnum;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,6 +32,10 @@ public class RegistrationFormUpdateRequestDto {
     @Size(max = 100, message = "teamName must be less than 100 characters")
     private String teamName;
 
+    @Schema(description = "Leader's name", example = "Lê Thị C")
+    @Size(max = 100, message = "leader must be less than 100 characters")
+    private String leader;
+
     @Schema(description = "Coach's name", example = "Trần Văn B")
     @Size(max = 100, message = "coach must be less than 100 characters")
     private String coach;
@@ -41,9 +43,6 @@ public class RegistrationFormUpdateRequestDto {
     @Schema(description = "Unit registering the team", example = "Sở Văn hóa & Thể thao Đà Nẵng")
     @Size(max = 255, message = "registrationUnit must be less than 255 characters")
     private String registrationUnit;
-
-    @Schema(description = "Registration date", example = "2024-06-01")
-    private LocalDate registrationDate;
 
     @Schema(description = "Number of athletes", example = "14")
     @Min(value = 1, message = "numberAthletes must be at least 1")

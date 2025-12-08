@@ -1,10 +1,5 @@
 package com.example.spring_vfdwebsite.entities;
 
-import java.time.LocalDate;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.example.spring_vfdwebsite.entities.enums.RegistrationStatusEnum;
 
 import jakarta.persistence.*;
@@ -19,7 +14,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "registration_forms", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "registration_forms", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "tournament_id", "email" })
+})
 public class RegistrationForm extends BaseEntity {
 
     @Id
@@ -45,6 +42,11 @@ public class RegistrationForm extends BaseEntity {
     @Column(name = "team_name", length = 100, nullable = false)
     private String teamName;
 
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "leader", length = 100, nullable = false)
+    private String leader;
+
     @Size(max = 255)
     @NotNull
     @Column(name = "registration_unit", length = 255, nullable = false)
@@ -59,10 +61,6 @@ public class RegistrationForm extends BaseEntity {
     @Column(name = "number_athletes", nullable = false)
     private Integer numberAthletes;
 
-    @NotNull
-    @Column(name = "registration_date", nullable = false)
-    private LocalDate registrationDate;
-
     @Size(max = 500)
     @NotNull
     @Column(name = "file_url", length = 500, nullable = false)
@@ -74,7 +72,6 @@ public class RegistrationForm extends BaseEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 

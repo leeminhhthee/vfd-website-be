@@ -68,8 +68,9 @@ public class Project extends BaseEntity {
     @Builder.Default
     private List<String> goals = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "bank_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "bank_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Bank bank;
+
 }

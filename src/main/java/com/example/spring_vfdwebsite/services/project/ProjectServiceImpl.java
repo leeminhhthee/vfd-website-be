@@ -39,7 +39,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     // ===================== Get All =====================
     @Override
-    @Cacheable(value = "projects", key = "'all'")
+    @Cacheable(value = {"projects", "banks"}, key = "'all'")
     @Transactional(readOnly = true)
     public List<ProjectResponseDto> getAllProjects() {
         System.out.println("🔥 Fetching all projects from the database...");
@@ -51,7 +51,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     // ===================== Get By Id =====================
     @Override
-    @Cacheable(value = "projects", key = "#root.args[0]")
+    @Cacheable(value = {"projects", "banks"}, key = "#root.args[0]")
     @Transactional(readOnly = true)
     public ProjectResponseDto getProjectById(Integer id) {
         Project project = projectRepository.findByIdProject(id)
@@ -62,7 +62,7 @@ public class ProjectServiceImpl implements ProjectService {
     // ===================== Create =====================
     @Override
     @Transactional
-    @CacheEvict(value = "projects", allEntries = true)
+    @CacheEvict(value = {"projects", "banks"}, allEntries = true)
     @LoggableAction(value = "CREATE", entity = "projects", description = "Create a new project")
     public ProjectResponseDto createProject(ProjectCreateRequestDto dto) {
 
@@ -93,8 +93,8 @@ public class ProjectServiceImpl implements ProjectService {
     // ===================== Update =====================
     @Override
     @Transactional
-    @CachePut(value = "projects", key = "#p0")
-    @CacheEvict(value = { "projects" }, allEntries = true)
+    @CachePut(value = {"projects", "banks"}, key = "#p0")
+    @CacheEvict(value = { "projects", "banks" }, allEntries = true)
     @LoggableAction(value = "UPDATE", entity = "projects", description = "Update an existing project")
     public ProjectResponseDto updateProject(Integer id, ProjectUpdateRequestDto dto) {
         Project project = projectRepository.findById(id)
@@ -138,7 +138,7 @@ public class ProjectServiceImpl implements ProjectService {
     // ===================== Delete =====================
     @Override
     @Transactional
-    @CacheEvict(value = { "projects" }, allEntries = true)
+    @CacheEvict(value = { "projects", "banks" }, allEntries = true)
     @LoggableAction(value = "DELETE", entity = "projects", description = "Delete an existing project")
     public void deleteProject(Integer id) {
         Project project = projectRepository.findById(id)
@@ -154,7 +154,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     // ===================== Get By Slug =====================
     @Override
-    @Cacheable(value = "projects", key = "#root.args[0]")
+    @Cacheable(value = {"projects", "banks"}, key = "#root.args[0]")
     @Transactional(readOnly = true)
     public ProjectResponseDto getProjectBySlug(String slug) {
         Project project = projectRepository.findBySlug(slug)
@@ -164,7 +164,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     // ===================== Get By Id and Slug =====================
     @Override
-    @Cacheable(value = "projects", key = "#root.args[0] + '-' + #root.args[1]")
+    @Cacheable(value = {"projects", "banks"}, key = "#root.args[0] + '-' + #root.args[1]")
     @Transactional(readOnly = true)
     public ProjectResponseDto getProjectByIdSlug(Integer id, String slug) {
         Project project = projectRepository.findByIdAndSlug(id, slug)

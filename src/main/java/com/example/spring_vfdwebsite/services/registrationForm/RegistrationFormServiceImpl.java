@@ -44,7 +44,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
 
     // ===================== Get all =====================
     @Override
-    @Cacheable(value = "registration-forms", key = "'all'")
+    @Cacheable(value = {"registration-forms", "tournaments"}, key = "'all'")
     @Transactional(readOnly = true)
     public List<RegistrationFormResponseDto> getAllRegistrationForms() {
         System.out.println("🔥 Fetching all registration forms from the database...");
@@ -56,7 +56,7 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
 
     // ===================== Get By Id =====================
     @Override
-    @Cacheable(value = "registration-forms", key = "#root.args[0]")
+    @Cacheable(value = {"registration-forms", "tournaments"}, key = "#root.args[0]")
     @Transactional(readOnly = true)
     public RegistrationFormResponseDto getRegistrationFormById(Integer id) {
         RegistrationForm form = registrationFormRepository.findById(id)
@@ -73,6 +73,15 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Tournament with id " + dto.getTournamentId() + " not found"));
+
+        if (registrationFormRepository.existsByTournament_IdAndEmail(
+                dto.getTournamentId(),
+                dto.getEmail())) {
+            throw new HttpException(
+                    "Email đã được dùng để đăng ký cho giải đấu này",
+                    HttpStatus.CONFLICT);
+        }
+
         // nếu mà giải đấu đã bắt đầu và kết thúc thì không cho đăng ký
         if (tournament.getStatus() != null &&
                 (tournament.getStatus() == TournamentStatusEnum.ONGOING ||
@@ -91,10 +100,10 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
                 .email(dto.getEmail())
                 .phoneNumber(dto.getPhoneNumber())
                 .teamName(dto.getTeamName())
+                .leader(dto.getLeader())
                 .registrationUnit(dto.getRegistrationUnit())
                 .coach(dto.getCoach())
                 .numberAthletes(dto.getNumberAthletes())
-                .registrationDate(dto.getRegistrationDate())
                 .fileUrl(dto.getFileUrl())
                 .status(RegistrationStatusEnum.PENDING)
                 .tournament(tournament)
@@ -133,6 +142,9 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
         if (dto.getTeamName() != null) {
             form.setTeamName(dto.getTeamName());
         }
+        if (dto.getLeader() != null) {
+            form.setLeader(dto.getLeader());
+        }
         if (dto.getRegistrationUnit() != null) {
             form.setRegistrationUnit(dto.getRegistrationUnit());
         }
@@ -141,9 +153,6 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
         }
         if (dto.getNumberAthletes() != null) {
             form.setNumberAthletes(dto.getNumberAthletes());
-        }
-        if (dto.getRegistrationDate() != null) {
-            form.setRegistrationDate(dto.getRegistrationDate());
         }
         if (dto.getFileUrl() != null) {
             if (form.getFileUrl() != null) {
@@ -240,7 +249,8 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
         return toDto(form);
     }
 
-    // =================== Get Registration Forms By Tournament Id ===================
+    // =================== Get Registration Forms By Tournament Id
+    // ===================
     @Override
     @Transactional(readOnly = true)
     public List<TeamRegistrationDto> getRegistrationFormsByTournamentId(Integer tournamentId) {
@@ -260,10 +270,10 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
                 .email(form.getEmail())
                 .phoneNumber(form.getPhoneNumber())
                 .teamName(form.getTeamName())
+                .leader(form.getLeader())
                 .registrationUnit(form.getRegistrationUnit())
                 .coach(form.getCoach())
                 .numberAthletes(form.getNumberAthletes())
-                .registrationDate(form.getRegistrationDate())
                 .fileUrl(form.getFileUrl())
                 .status(form.getStatus())
                 .tournament(tournamentDto)
