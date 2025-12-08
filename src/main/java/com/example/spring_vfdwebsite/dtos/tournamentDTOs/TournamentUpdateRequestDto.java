@@ -4,6 +4,8 @@ package com.example.spring_vfdwebsite.dtos.tournamentDTOs;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.example.spring_vfdwebsite.entities.enums.TournamentStatusEnum;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -41,6 +43,9 @@ public class TournamentUpdateRequestDto {
     @Size(max = 255)
     @Schema(description = "Location of the tournament", example = "Nhà thi đấu Đại học Đà Nẵng")
     private String location;
+
+    @Schema(description = "Status of the tournament", example = "upcoming")
+    private TournamentStatusEnum status;
 
     @Schema(description = "Whether the tournament is visible on the home page", example = "true")
     private Boolean isVisibleOnHome;

@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum TournamentStatusEnum {
     UPCOMING("upcoming"),
     ONGOING("ongoing"),
-    ENDED("ended");
+    ENDED("ended"),
+    POSTPONED("postponed");
 
     private final String value;
 

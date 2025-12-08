@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.spring_vfdwebsite.dtos.activityLogDTOs.ActivityLogCreateRequestDto;
@@ -24,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ActivityLogServiceImpl implements ActivityLogService {
     private final ActivityLogJpaRepository activityLogRepository;
 
@@ -41,7 +41,8 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     // Paginated Activity Logs
     @Override
-    @Cacheable(value = "activity-logs", key = "'paginated-' + #pageNumber + '-' + #pageSize")
+    // @Cacheable(value = "activity-logs", key = "'paginated-' + #pageNumber + '-' +
+    // #pageSize")
     @Transactional(readOnly = true)
     public PaginatedAcivityLogResponseDto getPaginatedActivityLogs(int pageNumber, int pageSize) {
 
@@ -93,14 +94,24 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     // Xóa log theo id
     @Override
-    @CacheEvict(value = "activity-logs", key = "'all'")
+    @CacheEvict(value = "activity-logs", allEntries = true)
     public void deleteActivityLog(List<Integer> ids) {
-        for (Integer id : ids) {
-            if (!activityLogRepository.existsById(id)) {
-                throw new EntityNotFoundException("ActivityLog not found with id: " + id);
-            }
-            activityLogRepository.deleteById(id);
+        // for (Integer id : ids) {
+        // if (!activityLogRepository.existsById(id)) {
+        // throw new EntityNotFoundException("ActivityLog not found with id: " + id);
+        // }
+        // activityLogRepository.deleteById(id);
+        // }
+        List<Integer> existingIds = activityLogRepository.findAllById(ids)
+                .stream()
+                .map(ActivityLog::getId)
+                .toList();
+
+        if (existingIds.size() != ids.size()) {
+            throw new EntityNotFoundException("Some IDs do not exist");
         }
+
+        activityLogRepository.deleteAllByIdInBatch(existingIds);
     }
 
     public List<String> getActionTypes() {
