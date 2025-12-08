@@ -21,7 +21,8 @@ public interface RegistrationFormJpaRepository extends JpaRepository<Registratio
                     r.teamName,
                     r.coach,
                     r.registrationUnit,
-                    r.numberAthletes
+                    r.numberAthletes,
+                    r.createdAt
                 )
                 FROM RegistrationForm r
                 WHERE r.tournament.id = :tournamentId
