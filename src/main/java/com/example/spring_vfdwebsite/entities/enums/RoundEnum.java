@@ -24,11 +24,19 @@ public enum RoundEnum {
 
     @JsonCreator
     public static RoundEnum fromValue(String value) {
-        for (RoundEnum type : RoundEnum.values()) {
-            if (type.value.equalsIgnoreCase(value)) {
-                return type;
-            }
+        if (value == null) {
+            return null;
         }
-        throw new IllegalArgumentException("Invalid category: " + value);
+
+        String normalized = value
+                .trim()
+                .toUpperCase()
+                .replace("-", "_");
+                
+        try {
+            return RoundEnum.valueOf(normalized);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid round: " + value);
+        }
     }
 }

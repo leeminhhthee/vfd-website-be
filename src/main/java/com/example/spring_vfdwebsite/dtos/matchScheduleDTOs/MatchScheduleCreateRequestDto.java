@@ -2,8 +2,6 @@ package com.example.spring_vfdwebsite.dtos.matchScheduleDTOs;
 
 import java.time.LocalDateTime;
 
-import com.example.spring_vfdwebsite.entities.enums.RoundEnum;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -17,7 +15,7 @@ import lombok.*;
 public class MatchScheduleCreateRequestDto {
     @NotNull
     @Schema(description = "Round of the match", example = "group")
-    private RoundEnum round;
+    private String round;
 
     @Schema(description = "Table/Group name if applicable", example = "Bảng A")
     private String groupTable;

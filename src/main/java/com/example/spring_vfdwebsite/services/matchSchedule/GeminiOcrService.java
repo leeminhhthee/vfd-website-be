@@ -53,7 +53,7 @@ public class GeminiOcrService {
                                             Trích xuất danh sách các trận đấu thành định dạng JSON.
                                             Các trường cần lấy:
                                             - id: Số thứ tự trận đấu, bắt đầu từ 1, tăng dần cho mỗi trận đấu
-                                            - round: Tên vòng đấu (GROUP|QUARTER_FINAL|SEMI_FINAL|FINAL|THIRD_PLACE|null)
+                                            - round: Tên vòng đấu (GROUP|ROUND_OF_16|QUARTER_FINAL|SEMI_FINAL|FINAL|THIRD_PLACE|null), lưu ý nếu extract được thông tin vòng đấu thì map đúng với Enum đã cho (tức là viết hoa, gạch dưới thay cho dấu cách hoặc dấu gạch nối, ví dụ: ROUND_OF_16 chứ không được viết ROUND-OF-16), nếu không xác định được thì để null
                                             - groupTable: Tên bảng (Bảng A, Bảng B...)
                                             - matchDate: Ngày giờ thi đấu (Định dạng ISO 8601)
                                             - teamA: Tên đội 1

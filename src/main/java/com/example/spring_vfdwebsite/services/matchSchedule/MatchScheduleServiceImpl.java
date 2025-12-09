@@ -18,6 +18,7 @@ import com.example.spring_vfdwebsite.dtos.matchScheduleDTOs.MatchScheduleRespons
 import com.example.spring_vfdwebsite.dtos.matchScheduleDTOs.MatchScheduleUpdateRequestDto;
 import com.example.spring_vfdwebsite.entities.MatchSchedule;
 import com.example.spring_vfdwebsite.entities.Tournament;
+import com.example.spring_vfdwebsite.entities.enums.RoundEnum;
 import com.example.spring_vfdwebsite.events.matchSchedule.MatchScheduleCreatedEvent;
 import com.example.spring_vfdwebsite.events.matchSchedule.MatchScheduleDeletedEvent;
 import com.example.spring_vfdwebsite.events.matchSchedule.MatchScheduleUpdatedEvent;
@@ -45,8 +46,19 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Tournament with id " + dto.getTournamentId() + " not found"));
 
+        RoundEnum round = null;
+        if (dto.getRound() != null) {
+            try {
+                round = RoundEnum.fromValue(dto.getRound());
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException(
+                        "Invalid round value: " + dto.getRound());
+            }
+        }
+
         MatchSchedule matchSchedule = MatchSchedule.builder()
-                .round(dto.getRound())
+                // Convert String -> Enum safely
+                .round(round)
                 .groupTable(dto.getGroupTable())
                 .matchDate(dto.getMatchDate())
                 .teamA(dto.getTeamA())
@@ -78,18 +90,28 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Tournament with id " + tournamentId + " not found"));
 
-        List<MatchSchedule> matchSchedules = dtos.stream()
-                .map(dto -> MatchSchedule.builder()
-                        .round(dto.getRound())
-                        .groupTable(dto.getGroupTable())
-                        .matchDate(dto.getMatchDate())
-                        .teamA(dto.getTeamA())
-                        .teamB(dto.getTeamB())
-                        .scoreA(dto.getScoreA())
-                        .scoreB(dto.getScoreB())
-                        .tournament(tournament)
-                        .build())
-                .toList();
+        List<MatchSchedule> matchSchedules = dtos.stream().map(dto -> {
+            RoundEnum round = null;
+            if (dto.getRound() != null) {
+                try {
+                    round = RoundEnum.fromValue(dto.getRound());
+                } catch (IllegalArgumentException ex) {
+                    throw new IllegalArgumentException(
+                            "Invalid round value: " + dto.getRound());
+                }
+            }
+
+            return MatchSchedule.builder()
+                    .round(round)
+                    .groupTable(dto.getGroupTable())
+                    .matchDate(dto.getMatchDate())
+                    .teamA(dto.getTeamA())
+                    .teamB(dto.getTeamB())
+                    .scoreA(dto.getScoreA())
+                    .scoreB(dto.getScoreB())
+                    .tournament(tournament)
+                    .build();
+        }).toList();
 
         // Lưu tất cả cùng lúc
         List<MatchSchedule> savedMatches = matchScheduleRepository.saveAll(matchSchedules);
@@ -115,7 +137,12 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
                 .orElseThrow(() -> new EntityNotFoundException("MatchSchedule with id " + id + " not found"));
 
         if (dto.getRound() != null) {
-            matchSchedule.setRound(dto.getRound());
+            try {
+                matchSchedule.setRound(RoundEnum.fromValue(dto.getRound()));
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException(
+                        "Invalid round value: " + dto.getRound());
+            }
         }
         if (dto.getGroupTable() != null) {
             matchSchedule.setGroupTable(dto.getGroupTable());
@@ -176,7 +203,12 @@ public class MatchScheduleServiceImpl implements MatchScheduleService {
             MatchSchedule match = matchMap.get(dto.getId());
 
             if (dto.getRound() != null) {
-                match.setRound(dto.getRound());
+                try {
+                    match.setRound(RoundEnum.fromValue(dto.getRound()));
+                } catch (IllegalArgumentException ex) {
+                    throw new IllegalArgumentException(
+                            "Invalid round value: " + dto.getRound());
+                }
             }
             if (dto.getGroupTable() != null) {
                 match.setGroupTable(dto.getGroupTable());
