@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum RoundEnum {
     GROUP("group"),
+    ROUND_OF_16("round-of-16"),
     QUARTER_FINAL("quarter-final"),
     SEMI_FINAL("semi-final"),
     THIRD_PLACE("third-place"),

@@ -19,6 +19,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    command: >
+      /wait-for-it.sh db:3306 --timeout=60 --strict -- 
+      /wait-for-it.sh redis:6379 --timeout=60 --strict -- 
+      java -jar app.jar
   db:
     image: mysql:latest
     container_name: mysqlvfd
@@ -35,7 +39,7 @@ services:
     healthcheck:
       # This healthcheck ensures that the MySQL service is ready before the app starts.
       test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-proot_password']
-      timeout: 30s
+      timeout: 5s
       retries: 10
       interval: 10s
       start_period: 30s

@@ -15,6 +15,9 @@ FROM amazoncorretto:21.0.8
 WORKDIR /app
 # Copy file jar đã build từ stage build sang stage chạy, đổi tên thành app.jar.
 COPY --from=build /app/build/libs/*.jar app.jar
+# Thêm wait-for-it.sh vào container
+COPY docker/wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
 # Mở port 8080 để ứng dụng lắng nghe (thường là port của Spring Boot).
 EXPOSE 8080
 # Thiết lập lệnh khởi chạy ứng dụng khi container start.
