@@ -36,6 +36,18 @@ public class MatchScheduleController {
                 return ResponseEntity.ok(created);
         }
 
+        // ==================== Create Multiple =====================
+        @Operation(summary = "Create multiple match schedules", description = "Create multiple match schedules with the provided details", responses = {
+                        @ApiResponse(responseCode = "201", description = "Match schedules created successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchScheduleResponseDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Invalid input data")
+        })
+        @PostMapping("/multiple")
+        public ResponseEntity<List<MatchScheduleResponseDto>> createMultipleMatchSchedules(
+                        @Validated @RequestBody List<MatchScheduleCreateRequestDto> dtos) {
+                List<MatchScheduleResponseDto> createdSchedules = matchScheduleService.createMultipleMatchSchedules(dtos);
+                return ResponseEntity.ok(createdSchedules);
+        }
+
         // ===================== Update =====================
         @Operation(summary = "Update an existing match schedule by ID", description = "Update the details of an existing match schedule", responses = {
                         @ApiResponse(responseCode = "200", description = "Match schedule updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchScheduleResponseDto.class))),
@@ -49,6 +61,18 @@ public class MatchScheduleController {
                 dto.setId(id);
                 MatchScheduleResponseDto updated = matchScheduleService.updateMatchSchedule(id, dto);
                 return ResponseEntity.ok(updated);
+        }
+
+        // ==================== Update Multiple =====================
+        @Operation(summary = "Update multiple match schedules", description = "Update multiple match schedules with the provided details", responses = {
+                        @ApiResponse(responseCode = "200", description = "Match schedules updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchScheduleResponseDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Invalid input data")
+        })
+        @PatchMapping("/multiple")
+        public ResponseEntity<List<MatchScheduleResponseDto>> updateMultipleMatchSchedules(
+                        @Validated @RequestBody List<MatchScheduleUpdateRequestDto> dtos) {
+                List<MatchScheduleResponseDto> updatedSchedules = matchScheduleService.updateMultipleMatchSchedules(dtos);
+                return ResponseEntity.ok(updatedSchedules);
         }
 
         // ===================== Delete =====================
