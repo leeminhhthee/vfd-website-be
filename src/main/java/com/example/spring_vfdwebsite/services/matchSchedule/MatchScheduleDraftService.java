@@ -15,7 +15,7 @@ public interface MatchScheduleDraftService {
 
     MatchScheduleDraftResponseDto findById(Integer id);
 
-    List<MatchAiDto> extractMatches(String imageUrl);
+    List<MatchAiDto> extractMatches(List<String> imageUrls);
 
     void approveDrafts(ApproveDraftsRequestDto dto);
     

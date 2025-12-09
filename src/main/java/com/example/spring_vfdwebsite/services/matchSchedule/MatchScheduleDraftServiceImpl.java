@@ -2,6 +2,7 @@ package com.example.spring_vfdwebsite.services.matchSchedule;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -73,18 +74,41 @@ public class MatchScheduleDraftServiceImpl implements MatchScheduleDraftService 
 
     // ==================== Extract Matches =====================
     @Override
-    @Transactional(readOnly = true)
-    @LoggableAction(value =  "EXTRACT_MATCHES", entity = "match-schedule-drafts", description = "Extract matches from image URL")
-    public List<MatchAiDto> extractMatches(String imageUrl) {
-        // return openRouterService.extractMatchesFromImageUrl(imageUrl);
-        return geminiOcrService.extractScheduleFromImageUrl(imageUrl);
+    @LoggableAction(value = "EXTRACT_MATCHES", entity = "match-schedule-drafts", description = "Extract matches from image URL")
+    public List<MatchAiDto> extractMatches(List<String> imageUrls) {
+        if (imageUrls == null || imageUrls.isEmpty()) {
+            return List.of();
+        }
+        log.info("Extracting matches from {} images...", imageUrls.size());
+        List<MatchAiDto> allMatches = imageUrls.parallelStream()
+                .map(url -> {
+                    try {
+                        return geminiOcrService.extractScheduleFromImageUrl(url);
+                    } catch (Exception e) {
+                        log.error("Lỗi khi extract ảnh {}: {}", url, e.getMessage());
+                        return new ArrayList<MatchAiDto>();
+                    }
+                })
+                .flatMap(List::stream)
+                .collect(Collectors.toList()); // Dùng collect để ra Mutable List (List có thể sửa đổi)
+
+        for (int i = 0; i < allMatches.size(); i++) {
+            // Gán ID mới: 1, 2, 3, 4, ...
+            allMatches.get(i).setId(i + 1);
+        }
+
+        return allMatches;
     }
+    // public List<MatchAiDto> extractMatches(String imageUrl) {
+    // // return openRouterService.extractMatchesFromImageUrl(imageUrl);
+    // return geminiOcrService.extractScheduleFromImageUrl(imageUrl);
+    // }
 
     // ==================== Save Drafts (New) =====================
     @Override
     @Transactional
     @CacheEvict(value = "match-schedule-drafts", allEntries = true) // Xóa cache để hiện data mới
-    @LoggableAction(value =  "SAVE_DRAFTS", entity = "match-schedule-drafts", description = "Save new match schedule drafts")
+    @LoggableAction(value = "SAVE_DRAFTS", entity = "match-schedule-drafts", description = "Save new match schedule drafts")
     public List<MatchScheduleDraftResponseDto> saveDrafts(SaveDraftsRequestDto dto) {
         // 1. Kiểm tra giải đấu có tồn tại không
         Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
@@ -103,7 +127,7 @@ public class MatchScheduleDraftServiceImpl implements MatchScheduleDraftService 
                     .matchDate(item.getMatchDate()) // Xử lý Ngày Giờ
                     .status(DraftStatusEnum.PENDING) // Mặc định là PENDING
                     .build();
-            
+
             draftsToSave.add(draft);
         }
 
@@ -117,25 +141,31 @@ public class MatchScheduleDraftServiceImpl implements MatchScheduleDraftService 
 
     // --- Helper: Xử lý Enum Vòng đấu ---
     private RoundEnum mapToRoundEnum(String roundStr) {
-        if (roundStr == null) return RoundEnum.GROUP;
+        if (roundStr == null)
+            return RoundEnum.GROUP;
         String lower = roundStr.toLowerCase();
-        
-        if (lower.contains("chung kết")) return RoundEnum.FINAL;
-        if (lower.contains("hạng ba") || lower.contains("tranh hạng ba")) return RoundEnum.THIRD_PLACE;
-        if (lower.contains("bán kết")) return RoundEnum.SEMI_FINAL;
-        if (lower.contains("tứ kết")) return RoundEnum.QUARTER_FINAL;
-        
+
+        if (lower.contains("chung kết"))
+            return RoundEnum.FINAL;
+        if (lower.contains("hạng ba") || lower.contains("tranh hạng ba"))
+            return RoundEnum.THIRD_PLACE;
+        if (lower.contains("bán kết"))
+            return RoundEnum.SEMI_FINAL;
+        if (lower.contains("tứ kết"))
+            return RoundEnum.QUARTER_FINAL;
+
         return RoundEnum.GROUP; // Mặc định
     }
 
     // ==================== Approve Drafts =====================
     @Override
     @Transactional
-    @CacheEvict(value = {"match-schedule-drafts", "tournaments", "match-schedules"}, allEntries = true)
-    @LoggableAction(value =  "APPROVE_DRAFTS", entity = "match-schedule-drafts", description = "Approve match schedule drafts and create official matches")
+    @CacheEvict(value = { "match-schedule-drafts", "tournaments", "match-schedules" }, allEntries = true)
+    @LoggableAction(value = "APPROVE_DRAFTS", entity = "match-schedule-drafts", description = "Approve match schedule drafts and create official matches")
     public void approveDrafts(ApproveDraftsRequestDto dto) {
         List<Integer> ids = dto.getId();
-        if (ids == null || ids.isEmpty()) return;
+        if (ids == null || ids.isEmpty())
+            return;
 
         List<MatchScheduleDraft> drafts = matchScheduleDraftJpaRepository.findAllById(ids);
 
@@ -149,7 +179,7 @@ public class MatchScheduleDraftServiceImpl implements MatchScheduleDraftService 
         for (MatchScheduleDraft draft : drafts) {
 
             if (draft.getStatus() != DraftStatusEnum.PENDING) {
-                continue; 
+                continue;
             }
 
             MatchSchedule match = MatchSchedule.builder()
@@ -171,8 +201,8 @@ public class MatchScheduleDraftServiceImpl implements MatchScheduleDraftService 
         if (!newMatches.isEmpty()) {
             matchScheduleRepository.saveAll(newMatches);
             matchScheduleDraftJpaRepository.deleteAll(draftsToDelete);
-            log.info("Approved and DELETED {} drafts. Created {} official matches.", 
-                      draftsToDelete.size(), newMatches.size());
+            log.info("Approved and DELETED {} drafts. Created {} official matches.",
+                    draftsToDelete.size(), newMatches.size());
         }
     }
 

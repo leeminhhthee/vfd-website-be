@@ -81,7 +81,7 @@ public class MatchScheduleDraftController {
     @PostMapping("/ai/extract")
     public ResponseEntity<List<MatchAiDto>> extractMatchScheduleDrafts(
             @Valid @RequestBody ScheduleAiExtractRequestDto requestDto) {
-        List<MatchAiDto> matches = matchScheduleDraftService.extractMatches(requestDto.getImageUrl());
+        List<MatchAiDto> matches = matchScheduleDraftService.extractMatches(requestDto.getImageUrls());
         return ResponseEntity.ok(matches);
     }
 
