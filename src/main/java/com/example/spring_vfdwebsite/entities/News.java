@@ -1,8 +1,5 @@
 package com.example.spring_vfdwebsite.entities;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.example.spring_vfdwebsite.entities.enums.NewsStatusEnum;
 import com.example.spring_vfdwebsite.entities.enums.NewsTypeEnum;
 
@@ -46,10 +43,8 @@ public class News extends BaseEntity {
     @Column(name = "status")
     private NewsStatusEnum status;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "author_by", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_by", nullable = true)
     private User authorBy;
 
     @Size(max = 500)
