@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,24 +19,33 @@ import com.example.spring_vfdwebsite.entities.ActivityLog;
 import com.example.spring_vfdwebsite.entities.User;
 import com.example.spring_vfdwebsite.repositories.ActivityLogJpaRepository;
 import com.example.spring_vfdwebsite.repositories.UserJpaRepository;
+import com.example.spring_vfdwebsite.services.systemConfig.SystemConfigService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Aspect
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class LoggingAspect {
 
     private final ActivityLogJpaRepository activityLogRepository;
     private final UserJpaRepository userJpaRepository;
+    private final SystemConfigService configService;
 
-    public LoggingAspect(ActivityLogJpaRepository activityLogRepository, UserJpaRepository userJpaRepository) {
-        this.activityLogRepository = activityLogRepository;
-        this.userJpaRepository = userJpaRepository;
-    }
+    @Value("${activity-log.enabled:true}")
+    private boolean activityLogFallback;
 
     @AfterReturning(pointcut = "@annotation(loggableAction)", returning = "result")
     public void logActivity(JoinPoint joinPoint, LoggableAction loggableAction, Object result) {
+        // 1) Check config
+        boolean enabled = configService.isActivityLogEnabledFallback(activityLogFallback);
+        if (!enabled) {
+            log.debug("Activity logging is disabled; skipping log for {}", loggableAction.entity());
+            return;
+        }
+
         log.info("AOP: Bắt đầu log hoạt động cho phương thức: {}", joinPoint.getSignature().getName());
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

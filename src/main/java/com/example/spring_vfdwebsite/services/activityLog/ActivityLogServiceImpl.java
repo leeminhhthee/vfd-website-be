@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +28,6 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     // Lấy tất cả activity logs kèm thông tin user
     @Override
-    @Cacheable(value = "activity-logs", key = "'all'")
     @Transactional(readOnly = true)
     public List<ActivityLogResponseDto> getAllActivityLogs() {
         List<ActivityLog> activityLogs = activityLogRepository.findAllWithUser();
