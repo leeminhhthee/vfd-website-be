@@ -70,6 +70,7 @@ public class Tournament extends BaseEntity {
     @ElementCollection
     @CollectionTable(name = "tournament_schedule_images", joinColumns = @JoinColumn(name = "tournament_id"))
     @Column(name = "image_url")
+    @JsonIgnore
     private List<String> scheduleImages;
 
     @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
