@@ -20,4 +20,6 @@ public interface TournamentService {
     TournamentResponseDto getTournamentBySlug(String slug);
 
     TournamentResponseDto getTournamentByIdSlug(Integer id, String slug);
+
+    List<TournamentResponseDto> getAllTournamentsWithoutMatchSchedules();
 }

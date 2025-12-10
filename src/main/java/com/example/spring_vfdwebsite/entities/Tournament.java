@@ -67,10 +67,9 @@ public class Tournament extends BaseEntity {
     @Column(name = "banner_url", length = 500)
     private String bannerUrl;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "tournament_schedule_images", joinColumns = @JoinColumn(name = "tournament_id"))
     @Column(name = "image_url")
-    @JsonIgnore
     private List<String> scheduleImages;
 
     @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

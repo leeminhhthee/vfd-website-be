@@ -109,4 +109,15 @@ public class TournamentController {
                 TournamentResponseDto tournament = tournamentService.getTournamentByIdSlug(id, slug);
                 return ResponseEntity.ok(tournament);
         }
+
+        // ===================== Get All Without Match Schedules =====================
+        @GetMapping("/without-match-schedules")
+        @Operation(summary = "Get all tournaments without match schedules", description = "Retrieve a list of all tournaments without their match schedules", responses = {
+                        @ApiResponse(responseCode = "200", description = "List of tournaments without match schedules", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TournamentResponseDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Internal server error")
+        })
+        public ResponseEntity<List<TournamentResponseDto>> getAllTournamentsWithoutMatchSchedules() {
+                List<TournamentResponseDto> tournaments = tournamentService.getAllTournamentsWithoutMatchSchedules();
+                return ResponseEntity.ok(tournaments);
+        }
 }

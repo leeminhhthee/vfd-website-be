@@ -1,6 +1,7 @@
 package com.example.spring_vfdwebsite.services.tournament;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -189,13 +190,23 @@ public class TournamentServiceImpl implements TournamentService {
 
     // ===================== Get All =====================
     @Override
-    @Cacheable(value = "tournaments", key = "'all'")
     @Transactional(readOnly = true)
     public List<TournamentResponseDto> getAllTournaments() {
         System.out.println("🔥 Fetching all tournaments from the database...");
         List<Tournament> tournaments = tournamentRepository.findAllTournament();
         return tournaments.stream()
                 .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    // ===================== Get All Without Match Schedules =====================
+    @Override
+    @Transactional(readOnly = true)
+    public List<TournamentResponseDto> getAllTournamentsWithoutMatchSchedules() {
+        System.out.println("🔥 Fetching all tournaments WITHOUT match schedules from the database...");
+        List<Tournament> tournaments = tournamentRepository.findAllTournamentsWithoutMatchSchedules();
+        return tournaments.stream()
+                .map(this::toDtoWithoutMatchSchedules)
                 .collect(Collectors.toList());
     }
 
@@ -280,9 +291,58 @@ public class TournamentServiceImpl implements TournamentService {
                 .isVisibleOnHome(tournament.getIsVisibleOnHome())
                 .registrationOpen(tournament.getRegistrationOpen())
                 .bannerUrl(tournament.getBannerUrl())
-                .scheduleImages(tournament.getScheduleImages())
+                // .scheduleImages(tournament.getScheduleImages())
+                .scheduleImages(
+                        tournament.getScheduleImages() != null
+                                ? new ArrayList<>(tournament.getScheduleImages())
+                                : List.of())
                 .tournamentDocuments(documentDtos)
                 .matchSchedules(matchScheduleDtos)
+                .createdBy(createdByDto)
+                .createdAt(tournament.getCreatedAt())
+                .updatedAt(tournament.getUpdatedAt())
+                .build();
+    }
+
+    // ===================== Mapping -> Dto without matchSchedules =====================
+    private TournamentResponseDto toDtoWithoutMatchSchedules(Tournament tournament) {
+        // ========== Map CreatedBy ==========
+        TournamentResponseDto.CreatedByDto createdByDto = TournamentResponseDto.CreatedByDto.builder()
+                .id(tournament.getCreatedBy().getId())
+                .fullName(tournament.getCreatedBy().getFullName())
+                .email(tournament.getCreatedBy().getEmail())
+                .imageUrl(tournament.getCreatedBy().getImageUrl())
+                .build();
+
+        // ========== Map Related Documents ==========
+        List<TournamentResponseDto.DocumentDto> documentDtos = tournament.getTournamentDocuments() == null
+                ? List.of()
+                : tournament.getTournamentDocuments().stream()
+                        .map(td -> TournamentResponseDto.DocumentDto.builder()
+                                .id(td.getDocument().getId())
+                                .title(td.getDocument().getTitle())
+                                .fileUrl(td.getDocument().getFileUrl())
+                                .build())
+                        .toList();
+
+        // Build DTO mà KHÔNG map matchSchedules
+        return TournamentResponseDto.builder()
+                .id(tournament.getId())
+                .name(tournament.getName())
+                .slug(tournament.getSlug())
+                .description(tournament.getDescription())
+                .startDate(tournament.getStartDate())
+                .endDate(tournament.getEndDate())
+                .location(tournament.getLocation())
+                .status(tournament.getStatus())
+                .isVisibleOnHome(tournament.getIsVisibleOnHome())
+                .registrationOpen(tournament.getRegistrationOpen())
+                .bannerUrl(tournament.getBannerUrl())
+                .scheduleImages(
+                        tournament.getScheduleImages() != null
+                                ? new ArrayList<>(tournament.getScheduleImages())
+                                : List.of())
+                .tournamentDocuments(documentDtos)
                 .createdBy(createdByDto)
                 .createdAt(tournament.getCreatedAt())
                 .updatedAt(tournament.getUpdatedAt())

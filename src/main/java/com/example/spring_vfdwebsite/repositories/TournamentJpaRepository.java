@@ -20,20 +20,28 @@ public interface TournamentJpaRepository extends JpaRepository<Tournament, Integ
 
     // Query methods get all tournaments with relations
     @Query("""
-        SELECT DISTINCT t FROM Tournament t
-        LEFT JOIN FETCH t.createdBy
-        LEFT JOIN FETCH t.tournamentDocuments
-        LEFT JOIN FETCH t.matchSchedules
-    """)
+                SELECT DISTINCT t FROM Tournament t
+                LEFT JOIN FETCH t.createdBy
+                LEFT JOIN FETCH t.tournamentDocuments
+                LEFT JOIN FETCH t.matchSchedules
+            """)
     List<Tournament> findAllTournament();
 
     // Query method to get tournament by id with relations
     @Query("""
-        SELECT t FROM Tournament t
-        LEFT JOIN FETCH t.createdBy
-        LEFT JOIN FETCH t.tournamentDocuments
-        LEFT JOIN FETCH t.matchSchedules
-        WHERE t.id = :id
-    """)
+                SELECT t FROM Tournament t
+                LEFT JOIN FETCH t.createdBy
+                LEFT JOIN FETCH t.tournamentDocuments
+                LEFT JOIN FETCH t.matchSchedules
+                WHERE t.id = :id
+            """)
     Optional<Tournament> findByIdTournament(@Param("id") Integer id);
+
+    // Query fetch only needed relations, exclude matchSchedules
+    @Query("""
+                SELECT DISTINCT t FROM Tournament t
+                LEFT JOIN FETCH t.createdBy
+                LEFT JOIN FETCH t.tournamentDocuments
+            """)
+    List<Tournament> findAllTournamentsWithoutMatchSchedules();
 }
