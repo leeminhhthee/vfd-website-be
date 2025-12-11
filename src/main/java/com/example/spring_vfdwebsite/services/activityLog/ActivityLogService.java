@@ -19,4 +19,6 @@ public interface ActivityLogService {
     // Paginated Activity Logs
     PaginatedAcivityLogResponseDto getPaginatedActivityLogs(int pageNumber, int pageSize);
 
+    // 10 Latest Activity Logs
+    List<ActivityLogResponseDto> getLatestActivityLogs();
 }

@@ -111,6 +111,16 @@ public class ActivityLogServiceImpl implements ActivityLogService {
         activityLogRepository.deleteAllByIdInBatch(existingIds);
     }
 
+    // Get 10 Latest Activity Logs
+    @Override
+    @Transactional(readOnly = true)
+    public List<ActivityLogResponseDto> getLatestActivityLogs() {
+        List<ActivityLog> latestLogs = activityLogRepository.findLatestLogs(PageRequest.of(0, 10));
+        return latestLogs.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
     public List<String> getActionTypes() {
         return List.of("CREATE", "READ", "UPDATE", "DELETE", "LOGIN", "LOGOUT", "REFRESH_TOKEN", "REGISTER_INIT",
                 "REGISTER_COMPLETE", "SEND_CHANGE_PASSWORD_OTP", "CHANGE_PASSWORD_WITH_OTP", "SEND_FORGOT_PASSWORD_OTP",
