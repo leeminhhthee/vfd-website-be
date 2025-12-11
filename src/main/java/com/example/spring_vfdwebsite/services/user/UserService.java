@@ -41,4 +41,7 @@ public interface UserService {
 	 */
 	void deleteUser(Integer id);
 
+	// Count total users
+	long countUsers();
+
 }

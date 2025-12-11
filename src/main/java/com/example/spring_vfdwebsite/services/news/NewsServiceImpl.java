@@ -199,6 +199,12 @@ public class NewsServiceImpl implements NewsService {
         return toDto(news);
     }
 
+    // ===================== Count News =====================
+    @Override
+    public long countNews() {
+        return newsRepository.count();
+    }
+
     // =================== Mapping -> Dto ===================
     private NewsResponseDto toDto(News news) {
         NewsResponseDto.AuthorByDto authorByDto = NewsResponseDto.AuthorByDto.builder()

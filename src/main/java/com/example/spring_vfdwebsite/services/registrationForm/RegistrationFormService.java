@@ -22,4 +22,7 @@ public interface RegistrationFormService {
     RegistrationFormResponseDto changeRegistrationFormStatus(Integer id, RegistrationFormRequestDto dto);
 
     List<TeamRegistrationDto> getRegistrationFormsByTournamentId(Integer tournamentId);
+
+    // Count total pending registration forms
+    long countAllPending();
 }

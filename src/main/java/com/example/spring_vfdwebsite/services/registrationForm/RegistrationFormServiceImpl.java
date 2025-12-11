@@ -249,12 +249,18 @@ public class RegistrationFormServiceImpl implements RegistrationFormService {
         return toDto(form);
     }
 
-    // =================== Get Registration Forms By Tournament Id
-    // ===================
+    // =================== Get Registration Forms By Tournament Id  ===================
     @Override
     @Transactional(readOnly = true)
     public List<TeamRegistrationDto> getRegistrationFormsByTournamentId(Integer tournamentId) {
         return registrationFormRepository.findAcceptedTeamsDto(tournamentId);
+    }
+
+    // =================== Count All Pending ===================
+    @Override
+    @Transactional(readOnly = true)
+    public long countAllPending() {
+        return registrationFormRepository.countAllPending();
     }
 
     // =================== Mapping -> Dto ===================

@@ -120,4 +120,14 @@ public class TournamentController {
                 List<TournamentResponseDto> tournaments = tournamentService.getAllTournamentsWithoutMatchSchedules();
                 return ResponseEntity.ok(tournaments);
         }
+
+        // ===================== Count Tournaments =====================
+        @Operation(summary = "Count total tournaments", description = "Retrieve the total count of tournaments", responses = {
+                        @ApiResponse(responseCode = "200", description = "Successfully counted total tournaments")
+        })
+        @GetMapping("/count")
+        public ResponseEntity<Long> countTournaments() {
+                long count = tournamentService.countTournaments();
+                return ResponseEntity.ok(count);
+        }
 }

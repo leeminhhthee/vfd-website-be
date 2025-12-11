@@ -76,4 +76,14 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Count total users")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successfully counted total users")
+    })
+    @GetMapping("/count")
+    public ResponseEntity<Long> countUsers() {
+        long count = userService.countUsers();
+        return ResponseEntity.ok(count);
+    }
 }

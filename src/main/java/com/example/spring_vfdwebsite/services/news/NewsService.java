@@ -21,4 +21,7 @@ public interface NewsService {
     NewsResponseDto getNewsBySlug(String slug);
 
     NewsResponseDto getNewsByIdSlug(Integer id, String slug);
+
+    // total news count
+    long countNews();
 }

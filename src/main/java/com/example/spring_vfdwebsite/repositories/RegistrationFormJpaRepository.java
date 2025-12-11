@@ -28,6 +28,13 @@ public interface RegistrationFormJpaRepository extends JpaRepository<Registratio
                 WHERE r.tournament.id = :tournamentId
                   AND r.status = com.example.spring_vfdwebsite.entities.enums.RegistrationStatusEnum.ACCEPTED
             """)
-    List<TeamRegistrationDto> findAcceptedTeamsDto( @Param("tournamentId")Integer tournamentId);
+    List<TeamRegistrationDto> findAcceptedTeamsDto(@Param("tournamentId") Integer tournamentId);
+
+    @Query("""
+            SELECT COUNT(r)
+            FROM RegistrationForm r
+            WHERE r.status = com.example.spring_vfdwebsite.entities.enums.RegistrationStatusEnum.PENDING
+            """)
+    long countAllPending();
 
 }

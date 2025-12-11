@@ -211,4 +211,10 @@ public class UserServiceImpl implements UserService {
         // Phát sự kiện UserDeletedEvent
         eventPublisher.publishEvent(new UserDeletedEvent(id));
     }
+
+    // Count total users
+    @Override
+    public long countUsers() {
+        return userRepository.count();
+    }
 }

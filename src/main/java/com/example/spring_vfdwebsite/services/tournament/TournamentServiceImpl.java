@@ -243,6 +243,12 @@ public class TournamentServiceImpl implements TournamentService {
         return toDto(tournament);
     }
 
+    // ===================== Count Tournaments =====================
+    @Override
+    public long countTournaments() {
+        return tournamentRepository.count();
+    }
+
     // ===================== Mapping -> Dto =====================
     private TournamentResponseDto toDto(Tournament tournament) {
         TournamentResponseDto.CreatedByDto createdByDto = TournamentResponseDto.CreatedByDto.builder()

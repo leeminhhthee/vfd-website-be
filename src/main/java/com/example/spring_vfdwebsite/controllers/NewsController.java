@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -126,5 +127,16 @@ public class NewsController {
 
                 // Trả về JSON object
                 return ResponseEntity.ok(Map.of("titles", suggestedTitles));
+        }
+
+        // ===================== Count News =====================
+        @Operation(summary = "Count total news")
+        @ApiResponses({
+                @ApiResponse(responseCode = "200", description = "Successfully counted total news")
+        })
+        @GetMapping("/count")
+        public ResponseEntity<Long> countNews() {
+                long count = newsService.countNews();
+                return ResponseEntity.ok(count);
         }
 }

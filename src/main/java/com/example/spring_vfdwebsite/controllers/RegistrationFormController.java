@@ -99,7 +99,8 @@ public class RegistrationFormController {
                 return ResponseEntity.ok(list);
         }
 
-        // ======== Get Registration Forms By Tournament Id Status Accepted  ================
+        // ======== Get Registration Forms By Tournament Id Status Accepted
+        // ================
         @Operation(summary = "Get accepted registration forms by tournament ID", description = "Retrieve a list of accepted registration forms for a specific tournament", responses = {
                         @ApiResponse(responseCode = "200", description = "List of accepted registration forms", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeamRegistrationDto.class))),
                         @ApiResponse(responseCode = "404", description = "Tournament not found")
@@ -110,5 +111,16 @@ public class RegistrationFormController {
                 List<TeamRegistrationDto> list = registrationFormService
                                 .getRegistrationFormsByTournamentId(tournamentId);
                 return ResponseEntity.ok(list);
+        }
+
+        // =================== Count All Pending ===================
+        @Operation(summary = "Count total pending registration forms", description = "Retrieve the total count of pending registration forms", responses = {
+                        @ApiResponse(responseCode = "200", description = "Successfully counted total pending registration forms"),
+                        @ApiResponse(responseCode = "500", description = "Internal server error")
+        })
+        @GetMapping("pending/count")
+        public ResponseEntity<Long> countAllPendingRegistrationForms() {
+                long count = registrationFormService.countAllPending();
+                return ResponseEntity.ok(count);
         }
 }

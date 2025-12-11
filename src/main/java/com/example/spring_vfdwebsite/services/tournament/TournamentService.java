@@ -22,4 +22,7 @@ public interface TournamentService {
     TournamentResponseDto getTournamentByIdSlug(Integer id, String slug);
 
     List<TournamentResponseDto> getAllTournamentsWithoutMatchSchedules();
+
+    // total tournament count
+    long countTournaments();
 }
